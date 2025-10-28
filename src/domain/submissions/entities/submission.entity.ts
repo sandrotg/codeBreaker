@@ -2,7 +2,7 @@ import { CasesResult } from "./casesResult.entity";
 
 export class Submission {
     constructor(
-        public readonly idSubmission: string,
+        public readonly submissionId: string,
         public readonly user: string,
         public readonly challengeId: string,
         public readonly language: Language,

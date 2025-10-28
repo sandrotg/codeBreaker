@@ -10,10 +10,10 @@ export class UpcateStatusSubmissionUseCase {
         const checkSubmission = await this.submissionPort.getById(idSubmission);
         if(!checkSubmission)throw new NotFoundException("submission not found")
         const newSubmission = new Submission(
-            checkSubmission.idSubmission,
+            checkSubmission.submissionId,
             checkSubmission.user,
             checkSubmission.challengeId,
-            checkSubmission.lenguage,
+            checkSubmission.language,
             input.status,
             checkSubmission.createdAt,
             input.score,

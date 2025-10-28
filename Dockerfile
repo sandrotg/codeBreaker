@@ -1,41 +1,43 @@
-# ---------- STAGE 1: Build ----------
-FROM node:20-alpine AS builder
-
+# ---------- STAGE 1: Development / Build ----------
+FROM node:20-alpine AS development
 WORKDIR /usr/src/app
 
-# Instala dependencias necesarias para Prisma y compilación
-RUN apk add --no-cache openssl
-
-# Copiamos los archivos de dependencias
+# Copiar archivos base de configuración
 COPY package*.json ./
+COPY tsconfig*.json ./
+COPY nest-cli.json ./
 
-# Instalamos dependencias (sin devDependencies aún)
-RUN npm ci
+# Copiar el código fuente y el esquema Prisma
+COPY src ./src
+COPY prisma ./prisma
 
-# Copiamos el código fuente
-COPY . .
+# Instalar dependencias
+RUN npm install
 
-# Genera el cliente de Prisma
-RUN npx prisma generate
+# Generar el cliente Prisma
+RUN npx prisma generate --schema=prisma/schema.prisma
 
-# Compila el proyecto NestJS
-RUN npm run build
+# Compilar el proyecto NestJS
+RUN npx nest build
 
-# ---------- STAGE 2: Run ----------
+# ---------- STAGE 2: Production ----------
 FROM node:20-alpine AS production
-
+ARG NODE_ENV=production
+ENV NODE_ENV=${NODE_ENV}
 WORKDIR /usr/src/app
 
-RUN apk add --no-cache openssl
+# Copiar package files e instalar dependencias de producción
+COPY --from=development /usr/src/app/package*.json ./
+RUN npm install --omit=dev
 
-# Copia los archivos necesarios desde la etapa de build
-COPY package*.json ./
-COPY --from=builder /usr/src/app/dist ./dist
-COPY --from=builder /usr/src/app/node_modules ./node_modules
-COPY --from=builder /usr/src/app/prisma ./prisma
+# Copiar el código compilado
+COPY --from=development /usr/src/app/dist ./dist
 
-# Expone el puerto donde corre NestJS
+# Copiar el cliente Prisma generado
+COPY --from=development /usr/src/app/node_modules/.prisma ./node_modules/.prisma
+
+# Copiar el esquema Prisma (por si se usa en runtime)
+COPY --from=development /usr/src/app/prisma ./prisma
+
 EXPOSE 3000
-
-# Comando de inicio
 CMD ["node", "dist/main.js"]
