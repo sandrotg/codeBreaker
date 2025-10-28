@@ -5,8 +5,7 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client"
-  output   = "./generated/client"
+  provider = "prisma-client-js"
 }
 
 datasource db {
@@ -15,67 +14,68 @@ datasource db {
 }
 
 model User {
-  userId   String  @id
-  email     String  @unique
-  passwordHash  String
-  name      String
-  roleId     String
-  createdAt  DateTime?
+  userId            String  @id
+  userName          String
+  email             String  @unique
+  passwordHash      String
+  roleId            String
+  createdAt         DateTime @default(now())
 }
 
 model Role {
-  roleId   String  @id
-  permissions Permission[]
+  roleId            String  @id
+  name              String
+  permissions       Permission[]
 }
 
 model Permission{
-  permissionId  String @id
-  roleId         String
-  name          String
-  description   String
-  rol   Role     @relation(fields:[roleId], references:[roleId])
+  permissionId      String  @id
+  roleId            String
+  name              String
+  description       String
+  rol               Role     @relation(fields:[roleId], references:[roleId])
 }
 
 model Challenge {
-  challengeId   String @id
-  title         String
-  difficulty    Difficulty
-  tags          String[]
-  timeLimit     Int
-  memoryLimit   Int
-  description   String
-  state         challengeState
-  submissions   Submission[]
-  testCases     TestCase[]
+  challengeId       String  @id
+  title             String
+  difficulty        Difficulty
+  tags              String[]
+  timeLimit         Int
+  memoryLimit       Int
+  description       String
+  state             challengeState
+  submissions       Submission[]
+  testCases         TestCase[]
 }
 
 model TestCase {
-  testCaseId    String @id
-  challengeId   String
-  input         String
-  output        String
-  challenge     Challenge   @relation(fields:[challengeId], references:[challengeId])
+  testCaseId        String  @id
+  challengeId       String
+  input             String
+  output            String
+  challenge         Challenge   @relation(fields:[challengeId], references:[challengeId])
 }
 
 model Submission {
-  submissionId    String @id
-  user            String
-  challengeId     String
-  language        Language
-  status          StatusSubmission
-  createdAt       DateTime?
-  score           Int?
-  timeMsTotal     Int?
-  cases           CaseResult[]
-  challenge       Challenge @relation(fields:[challengeId], references:[challengeId])
+  submissionId      String  @id
+  user              String
+  challengeId       String
+  language          Language
+  status            StatusSubmission
+  createdAt         DateTime?
+  score             Int?
+  timeMsTotal       Int?
+  cases             CaseResult[]
+  challenge         Challenge @relation(fields:[challengeId], references:[challengeId])
 }
 
 model CaseResult {
-  caseId    String @id
-  status    String
-  timeMs    Int
-  submissionId  String
-  submission  Submission  @relation(fields:[submissionId], references:[submissionId])
+  caseId            String  @id
+  status            String
+  timeMs            Int
+  submissionId      String
+  submission        Submission  @relation(fields:[submissionId], references:[submissionId])
 }
 enum Difficulty {
   Easy 

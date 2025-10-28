@@ -1,11 +1,11 @@
 import { Inject, Injectable } from "@nestjs/common";
 import type { UserRepository } from "src/domain/users/repositories/user.repository.port";
 import { User } from "src/domain/users/entities/user.entity";
-import type { TokenServicePort } from "src/domain/auth/token.service.port";
+import type { TokenServicePort } from "src/domain/auth/token.repository.port";
 import { LoginDto } from "../dto/login.dto";
 import { TOKEN_SERVICE,USER_REPOSITORY } from "src/application/tokens";
 import * as bcrypt from "bcrypt";
-import { TokenPayload } from "src/domain/auth/token.service.port";
+import { TokenPayload } from "src/domain/auth/token.repository.port";
 
 @Injectable()
 export class LoginUseCase {
