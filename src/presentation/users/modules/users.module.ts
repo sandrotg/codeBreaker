@@ -13,6 +13,9 @@ import { JwtTokenService } from "src/infrastructure/auth/database/prisma-token.r
 
 
 import { LoginUseCase } from "src/application/auth/use-cases/login.use-case";
+import { CreateUserUseCase } from "src/application/users/use-cases/createUser.use-case";
+import { GetUserUseCase } from "src/application/users/use-cases/get-user.use-case";
+import { UpdateUserUseCase } from "src/application/users/use-cases/updateUser.use-case";
 
 @Module({
   imports: [
@@ -46,6 +49,22 @@ import { LoginUseCase } from "src/application/auth/use-cases/login.use-case";
         new LoginUseCase(repo, token),
       inject: [USER_REPOSITORY, TOKEN_SERVICE],
     },
+        {
+      provide: CreateUserUseCase,
+      useFactory: (repo: UserRepository) => new CreateUserUseCase(repo),
+      inject: [USER_REPOSITORY],
+    },
+    {
+      provide: GetUserUseCase,
+      useFactory: (repo: UserRepository) => new GetUserUseCase(repo),
+      inject: [USER_REPOSITORY],
+    },
+    {
+      provide: UpdateUserUseCase,
+      useFactory: (repo: UserRepository) => new UpdateUserUseCase(repo),
+      inject: [USER_REPOSITORY],
+    },
+    
   ],
 })
 export class UsersModule {}
