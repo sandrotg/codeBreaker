@@ -5,8 +5,8 @@ export class Submission {
         public readonly idSubmission: string,
         public readonly user: string,
         public readonly challengeId: string,
-        public readonly lenguage: Lenguage,
-        public readonly status: StatusSubmision,
+        public readonly language: Language,
+        public readonly status: StatusSubmission,
         public readonly createdAt: Date, 
         public readonly score?: number,
         public readonly timeMsTotal?: number,
@@ -14,14 +14,14 @@ export class Submission {
     ){}
 }
 
-export enum Lenguage {
+export enum Language {
     Python = "Python",
     CPlusPlus = "C++",
     Java = "Java",
     Node = "Node.js",
 }
 
-export enum StatusSubmision{
+export enum StatusSubmission{
     QUEUED = "QUEUED",
     RUNNING = "RUNNING",
     ACCEPTED = "ACCEPTED",

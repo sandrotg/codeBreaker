@@ -14,4 +14,94 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model User {
+  userId   String  @id
+  email     String  @unique
+  passwordHash  String
+  name      String
+  roleId     String
+  createdAt  DateTime?
+}
 
+model Role {
+  roleId   String  @id
+  permissions permission[]
+}
+
+model Permission{
+  permissionId  String @id
+  roleId         String
+  name          String
+  description   String
+  rol   Role     @relation(fields:[roleId], referencies:[roleId])
+}
+
+model Challenge {
+  challengeId   String @id
+  title         String
+  difficulty    Difficulty
+  tags          String[]
+  timeLimit     Int
+  memoryLimit   Int
+  description   String
+  state         challengeState
+  submissions   Submission[]
+  testCases     TestCase[]
+}
+
+model TestCase {
+  testCaseId    String @id
+  challengeId   String
+  input         String
+  output        String
+  challenge     Challenge   @relation(fields:[challengeId], referencies:[challengeId])
+}
+
+model Submission {
+  submissionId    String @id
+  user            String
+  challengeId     String
+  language        Language
+  status          StatusSubmission
+  createdAt       DateTime?
+  score           Int?
+  timeMsTotal     Int?
+  cases           CaseResult[]
+  challenge       Challenge @relation(fields:[challengeId], referencies:[challengeId])
+}
+
+model casesResult {
+  caseId    String @id
+  status    String
+  timeMs    Int
+  submissionId  String
+  submission  Submission  @relation(fields:[submissionId], referencies:[submissionId])
+}
+enum Difficulty {
+  Easy 
+  Medium
+  Hard
+}
+
+enum challengeState {
+  Draft
+  Published
+  Archived
+}
+
+enum Language {
+  Python
+  CPlusPlus @map("C++")
+  Java
+  Node      @map("Node.js")
+}
+
+enum StatusSubmission {
+    QUEUED
+    RUNNING 
+    ACCEPTED 
+    WRONG_ANSWER
+    TIME_LIMIT_EXCEEDED
+    RUNTIME_ERROR
+    COMPILATION_ERROR
+}
