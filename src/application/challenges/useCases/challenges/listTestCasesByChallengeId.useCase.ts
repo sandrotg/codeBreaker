@@ -1,7 +1,7 @@
 import { TestCase } from "src/domain/challenges/entities/testCases.entity";
 import { ChallengeRepository } from "src/domain/challenges/repositories/challenges.repository";
 
-export class ListChallengesUseCase {
+export class ListTestCasesByChallengeIdUseCase {
     constructor(
         private readonly challengesRepo: ChallengeRepository
     ){}
