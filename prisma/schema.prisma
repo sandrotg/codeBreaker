@@ -1,0 +1,107 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  userId            String  @id
+  userName          String
+  email             String  @unique
+  passwordHash      String
+  roleId            String
+  createdAt         DateTime @default(now())
+}
+
+model Role {
+  roleId            String  @id
+  name              String
+  permissions       Permission[]
+}
+
+model Permission{
+  permissionId      String  @id
+  roleId            String
+  name              String
+  description       String
+  rol               Role     @relation(fields:[roleId], references:[roleId])
+}
+
+model Challenge {
+  challengeId       String  @id
+  title             String
+  difficulty        Difficulty
+  tags              String[]
+  timeLimit         Int
+  memoryLimit       Int
+  description       String
+  state             challengeState
+  submissions       Submission[]
+  testCases         TestCase[]
+}
+
+model TestCase {
+  testCaseId        String  @id
+  challengeId       String
+  input             String
+  output            String
+  challenge         Challenge   @relation(fields:[challengeId], references:[challengeId])
+}
+
+model Submission {
+  submissionId      String  @id
+  user              String
+  challengeId       String
+  language          Language
+  status            StatusSubmission
+  createdAt         DateTime?
+  score             Int?
+  timeMsTotal       Int?
+  cases             CaseResult[]
+  challenge         Challenge @relation(fields:[challengeId], references:[challengeId])
+}
+
+model CaseResult {
+  caseId            String  @id
+  status            String
+  timeMs            Int
+  submissionId      String
+  submission        Submission  @relation(fields:[submissionId], references:[submissionId])
+}
+enum Difficulty {
+  Easy 
+  Medium
+  Hard
+}
+
+enum challengeState {
+  Draft
+  Published
+  Archived
+}
+
+enum Language {
+  Python
+  CPlusPlus @map("C++")
+  Java
+  Node      @map("Node.js")
+}
+
+enum StatusSubmission {
+    QUEUED
+    RUNNING 
+    ACCEPTED 
+    WRONG_ANSWER
+    TIME_LIMIT_EXCEEDED
+    RUNTIME_ERROR
+    COMPILATION_ERROR
+}

@@ -1,16 +1,11 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
-import { UsersModule } from './presentation/users/modules/users.module';
-import { join } from 'path';
-import * as path from "path"
-import { RolesModule } from './presentation/users/modules/roles.module';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
+import { PrismaService } from './infrastructure/prisma.service';
+
 @Module({
-  imports: [
-    ConfigModule.forRoot({ 
-      envFilePath: path.resolve(__dirname, '../../../.env'),
-      isGlobal: true
-     }),
-    UsersModule,RolesModule
-  ],
+  imports: [],
+  controllers: [AppController],
+  providers: [AppService, PrismaService],
 })
 export class AppModule {}

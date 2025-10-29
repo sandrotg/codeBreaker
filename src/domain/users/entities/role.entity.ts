@@ -1,7 +1,12 @@
-    export class Role {
+export class Role {
   constructor(
-    public readonly roleId: number | null,
-    public readonly name: 'Admin' | 'Student' ,
-    public readonly permissions?: string | null
-  ) {}
+    public readonly roleId: string,
+    public readonly name: roleName,
+    public readonly permissions: string[]
+  ) { }
+}
+
+export enum roleName {
+    ADMIN =  'Admin',
+    STUDENT = 'Student',
 }
