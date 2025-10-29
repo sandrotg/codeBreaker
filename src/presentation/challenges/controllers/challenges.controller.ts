@@ -50,7 +50,7 @@ export class ChallengeController {
         return await this.listAllChallenges.execute();
     }
 
-    @Get("/list/:id/testcases")
+    @Get("/:id/testcases")
     @ApiOperation({ summary: "List testCases" })
     @ApiOkResponse({ description: "TestCases is shown correctly" })
     async listTestCasesByChallengeId(@Param("id") id: string) {

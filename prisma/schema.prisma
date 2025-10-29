@@ -6,6 +6,7 @@
 
 generator client {
   provider = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
 }
 
 datasource db {
@@ -20,12 +21,14 @@ model User {
   passwordHash      String
   roleId            String
   createdAt         DateTime @default(now())
+  role              Role     @relation(fields:[roleId], references:[roleId])
 }
 
 model Role {
   roleId            String  @id
-  name              String
+  name              roleName
   permissions       Permission[]
+  user              User[]
 }
 
 model Permission{
@@ -63,7 +66,7 @@ model Submission {
   challengeId       String
   language          Language
   status            StatusSubmission
-  createdAt         DateTime?
+  createdAt         DateTime  @default(now())
   score             Int?
   timeMsTotal       Int?
   cases             CaseResult[]
@@ -77,6 +80,7 @@ model CaseResult {
   submissionId      String
   submission        Submission  @relation(fields:[submissionId], references:[submissionId])
 }
+
 enum Difficulty {
   Easy 
   Medium
@@ -104,4 +108,9 @@ enum StatusSubmission {
     TIME_LIMIT_EXCEEDED
     RUNTIME_ERROR
     COMPILATION_ERROR
+}
+
+enum roleName {
+  Admin
+  Student
 }
