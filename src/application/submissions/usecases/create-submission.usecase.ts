@@ -1,4 +1,4 @@
-import { Submission } from "src/domain/submissions/entities/submission.entity";
+import { StatusSubmission, Submission } from "src/domain/submissions/entities/submission.entity";
 import { SubmissionRepositoryPort } from "src/domain/submissions/repositories/submission.repository.port";
 import { CreateSubmissionDto } from "../dto/create-submission.dto";
 import { randomUUID } from "crypto";
@@ -15,7 +15,7 @@ export class CreateSubmissionUseCase {
             input.user,
             input.challengeId,
             input.lenguage,
-            input.status,
+            StatusSubmission.QUEUED,
             new Date()
         )
         return await this.submissionPort.save(submission);

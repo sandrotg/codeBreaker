@@ -3,7 +3,7 @@ import { UpdateStatusSubmissionDto } from "../dto/update-status-submission.dto";
 import { Submission } from "src/domain/submissions/entities/submission.entity";
 import { NotFoundException } from "@nestjs/common";
 
-export class UpcateStatusSubmissionUseCase {
+export class UpdateStatusSubmissionUseCase {
     constructor(private readonly submissionPort: SubmissionRepositoryPort){}
 
     async execute(idSubmission: string, input: UpdateStatusSubmissionDto): Promise<Submission>{

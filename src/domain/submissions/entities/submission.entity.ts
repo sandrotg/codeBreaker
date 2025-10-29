@@ -5,7 +5,7 @@ export class Submission {
         public readonly submissionId: string,
         public readonly user: string,
         public readonly challengeId: string,
-        public readonly language: Language,
+        public readonly language: SubmissionLanguage,
         public readonly status: StatusSubmission,
         public readonly createdAt: Date, 
         public readonly score?: number,
@@ -14,7 +14,7 @@ export class Submission {
     ){}
 }
 
-export enum Language {
+export enum SubmissionLanguage {
     Python = "Python",
     CPlusPlus = "C++",
     Java = "Java",

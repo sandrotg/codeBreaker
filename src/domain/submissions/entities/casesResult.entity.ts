@@ -1,8 +1,8 @@
 export class CasesResult {
     constructor(
-        private readonly caseId: string,
-        private readonly status: string,
-        private readonly timeMs: number
+        public readonly caseId: string,
+        public readonly status: string,
+        public readonly timeMs: number
     ) { }
 
 }
