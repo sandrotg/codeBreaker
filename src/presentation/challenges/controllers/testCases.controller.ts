@@ -10,7 +10,7 @@ import { UpdateTestCaseDto } from 'src/application/challenges/dto/testCases/upda
 
 @ApiTags("TestCase")
 @Controller("testcase")
-export class ChallengeController {
+export class TestCasesController {
     constructor(
         private readonly createTestCase: CreateTestCaseUseCase,
         private readonly deleteTestCase: DeleteTestCaseUseCase,
