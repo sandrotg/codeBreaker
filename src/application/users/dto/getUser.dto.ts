@@ -22,9 +22,9 @@ export class GetUserDto{
         description: "Id for Searching",
         example: 1
     })
-    @IsNumber()
+    @IsString()
     @IsOptional()
-    userId?: number
+    userId?: string
     
     @ApiProperty({
     description: "Password for registration",

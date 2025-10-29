@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import type { RoleRepository } from "src/domain/users/repositories/role.repository.port";
 import { Role } from "src/domain/users/entities/role.entity";
-import { PrismaService } from "./prisma.service";
+import { PrismaService } from "src/infrastructure/prisma.service";
 
 @Injectable()
 export class PrismaRoleRepository implements RoleRepository {
@@ -17,10 +17,11 @@ export class PrismaRoleRepository implements RoleRepository {
             });
             return new Role (
                 saved.roleId,
-                saved.name
+                saved.name,
+                saved.permissions
             );
     }
-    async findRoleById(roleId: number): Promise<Role | null> {
+    async findRoleById(roleId: string): Promise<Role | null> {
         const role = await this.prisma.role.findUnique({where:{roleId}})
         return role
     }

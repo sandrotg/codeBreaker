@@ -1,4 +1,4 @@
-export class Challenge {
+export class Permission {
     constructor(
         public readonly permissionId: string,
         public readonly roleId: string,

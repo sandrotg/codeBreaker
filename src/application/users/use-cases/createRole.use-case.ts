@@ -3,6 +3,7 @@ import { Role } from "src/domain/users/entities/role.entity";
 import type { RoleRepository } from "src/domain/users/repositories/role.repository.port";
 import { CreateRoleDto } from "../dto/createRole.dto";
 import { ROLE_REPOSITORY } from "src/application/tokens";
+import { randomUUID } from "crypto";
 
 @Injectable()
 export class CreateRoleUseCase{
@@ -12,12 +13,12 @@ export class CreateRoleUseCase{
 
     async execute(roleInput: CreateRoleDto ): Promise<Role>{
         const role = new Role(
-            null,
-            roleInput.name
-        )
+            randomUUID(),
+            roleInput.name,
+            roleInput.permissions? [roleInput.permissions]:[]    // si viene un permiso, lo metemos en array
+  
+        );
+
         return this.roleRepo.save(role);
-
-
-
     }
 }

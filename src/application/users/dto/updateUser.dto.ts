@@ -10,7 +10,7 @@ export class UpdateUserDto{
     })
     @IsNumber()
     @IsNotEmpty()
-    userId: number
+    userId: string
     
     
     @ApiProperty({

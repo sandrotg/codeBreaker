@@ -25,7 +25,7 @@ export class CreateUserDto {
     })
     @IsNumber()
     @IsNotEmpty()
-    roleId: number;
+    roleId: string;
 
     @ApiProperty({
         description: "Email for registration",

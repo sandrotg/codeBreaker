@@ -4,7 +4,7 @@ import { ROLE_REPOSITORY } from "src/application/tokens";
 import { RoleRepository } from "src/domain/users/repositories/role.repository.port";
 import { CreateRoleUseCase } from "src/application/users/use-cases/createRole.use-case";
 import { GetRoleUseCase } from "src/application/users/use-cases/getRole.use-case";
-import { PrismaService } from "src/infrastructure/users/database/prisma.service";
+import { PrismaService } from "src/infrastructure/prisma.service";
 import { PrismaRoleRepository } from "src/infrastructure/users/database/prisma-role.repository";
 
 

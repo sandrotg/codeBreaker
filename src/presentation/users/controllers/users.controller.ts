@@ -43,7 +43,7 @@ export class UsersController{
   @ApiOperation({summary:"Update User"})
   @ApiOkResponse({description:"User updated correctly"})
 
-  async update(@Param('id', ParseIntPipe) id: number, @Body() body: UpdateUserDto){
+  async update(@Param('id') id: string, @Body() body: UpdateUserDto){
     const updatedUser = await this.updateUser.execute({
       userId: id,
       email: body.email,
@@ -56,7 +56,7 @@ export class UsersController{
   @Get('/:id')
   @ApiOperation({summary: "Find Id"})
   @ApiOkResponse({description:"User Found Correctly"})
-  async GetUserById(@Param('id', ParseIntPipe) id: number){
+  async GetUserById(@Param('id') id: string){
     const user = await this.getUser.execute({
       userId: id,
       criteria: 'id'

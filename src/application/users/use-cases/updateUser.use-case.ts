@@ -26,11 +26,10 @@ export class UpdateUserUseCase{
         
         const updatedUser = new User(
             user.userId,
-            updateInput.username ?? user.username,
+            updateInput.username ?? user.userName,
             passwordHash,
             user.roleId,
             updateInput.email ?? user.email,
-            user.status,
             user.createdAt
         )
 

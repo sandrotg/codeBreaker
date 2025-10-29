@@ -4,6 +4,7 @@ import type { UserRepository } from "src/domain/users/repositories/user.reposito
 import { CreateUserDto } from "../dto/createUser.dto";
 import * as bcrypt from "bcrypt";
 import { USER_REPOSITORY } from "src/application/tokens";
+import { randomUUID } from "crypto";
 
 @Injectable()
 export class CreateUserUseCase {
@@ -18,12 +19,11 @@ export class CreateUserUseCase {
     }
     const passwordHash = await bcrypt.hash(userInput.password, 10)
     const user = new User(
-      null,
+      randomUUID(),
       userInput.username,
       passwordHash,
       userInput.roleId,
       userInput.email,
-      'active',
       new Date()
     );
     return this.userRepo.save(user);

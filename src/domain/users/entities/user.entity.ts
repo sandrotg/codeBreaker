@@ -4,7 +4,7 @@ export class User {
     public readonly userName: string,
     public readonly email: string,
     public readonly passwordHash: string,
-    public readonly roleId: number,
+    public readonly roleId: string,
     public readonly createdAt: Date
   ) { }
 }

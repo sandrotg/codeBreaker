@@ -27,7 +27,7 @@ export class RolesController{
     @Get ("/find/:id")
     @ApiOperation({summary: "Find Role"})
     @ApiOkResponse({description: "The user is shown correctly"})
-    async findRoleById(@Param("id", ParseIntPipe) id:number){
+    async findRoleById(@Param("id") id:string){
         const role = await this.getRole.execute(id)
         return role
     }

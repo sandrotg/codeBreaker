@@ -7,7 +7,7 @@ import { TOKEN_SERVICE,USER_REPOSITORY } from "src/application/tokens";
 import { UserRepository } from "src/domain/users/repositories/user.repository.port";
 import { TokenServicePort } from "src/domain/auth/token.repository.port";
 
-import { PrismaService } from "src/infrastructure/users/database/prisma.service";
+import { PrismaService } from "src/infrastructure/prisma.service";
 import { PrismaUserRepository } from "src/infrastructure/users/database/prisma-user.repository";
 import { JwtTokenService } from "src/infrastructure/auth/database/prisma-token.repository";
 

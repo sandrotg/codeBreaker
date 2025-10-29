@@ -9,7 +9,7 @@ export class GetRoleUseCase{
        @Inject(ROLE_REPOSITORY) private readonly roleRepo: RoleRepository
     ){}
 
-    async execute(roleId:number): Promise <Role| null>{
+    async execute(roleId:string): Promise <Role| null>{
         
         const role = await this.roleRepo.findRoleById(roleId);
         if  (roleId === null){
