@@ -6,6 +6,7 @@ import { SubmitJobUseCase } from 'src/application/jobs/use-cases/submit-job.usec
 import { GetJobUseCase } from 'src/application/jobs/use-cases/get-job.usecase';
 import { ListJobsUseCase } from 'src/application/jobs/use-cases/list-jobs.usecase';
 import { toJobDto } from 'src/application/jobs/mappers/job.mapper';
+import { ApiOperation, ApiParam } from '@nestjs/swagger';
 
 @Controller('jobs')
 export class JobsController {
@@ -41,6 +42,14 @@ export class JobsController {
   }
 
   @Get(':id')
+  @ApiOperation({ summary: 'Get job by ID', description: 'Retrieves a specific job by its ID' })
+  @ApiParam({
+    name: 'id',
+    type: String,
+    description: 'The ID of the job',
+    required: true,
+    example: '123e4567-e89b-12d3-a456-426614174000'
+  })
   async get(@Param('id') id: string) {
     const job = await this.getJob.execute(id);
     if (!job) throw new HttpException('Job not found', HttpStatus.NOT_FOUND);

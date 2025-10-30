@@ -64,7 +64,6 @@ services:
       "
     volumes:
       - .:/usr/src/app
-      - ./runner-scripts:/runner-scripts:ro
       - /var/run/docker.sock:/var/run/docker.sock
 
   
