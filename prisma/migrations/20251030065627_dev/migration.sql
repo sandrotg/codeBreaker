@@ -1,4 +1,7 @@
 -- CreateEnum
+CREATE TYPE "JobStatus" AS ENUM ('QUEUED', 'PROCESSING', 'COMPLETED', 'FAILED');
+
+-- CreateEnum
 CREATE TYPE "Difficulty" AS ENUM ('Easy', 'Medium', 'Hard');
 
 -- CreateEnum
@@ -79,6 +82,24 @@ CREATE TABLE "Submission" (
     "timeMsTotal" INTEGER,
 
     CONSTRAINT "Submission_pkey" PRIMARY KEY ("submissionId")
+);
+
+-- CreateTable
+CREATE TABLE "Job" (
+    "id" TEXT NOT NULL,
+    "fileKey" TEXT NOT NULL,
+    "inputKey" TEXT NOT NULL,
+    "language" TEXT NOT NULL,
+    "status" "JobStatus" NOT NULL DEFAULT 'QUEUED',
+    "output" TEXT,
+    "error" TEXT,
+    "exitCode" INTEGER,
+    "executionTime" INTEGER,
+    "memoryUsed" INTEGER,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "Job_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
