@@ -36,15 +36,20 @@ export class DockerRunnerService {
       const inputPath = path.join(jobDir, 'input.txt');
       fs.writeFileSync(inputPath, inputData || '');
 
-      const runnerScriptPath = '/runner-scripts/runner.sh';
+      const dockerMountedRunnerPath = '/runner-scripts/runner.sh';
+      const localRunnerPath = path.resolve(process.cwd(), 'runner-scripts', 'runner.sh');
       const jobRunnerPath = path.join(jobDir, 'runner.sh');
 
-      if (fs.existsSync(runnerScriptPath)) {
-        fs.copyFileSync(runnerScriptPath, jobRunnerPath);
-        fs.chmodSync(jobRunnerPath, 0o755);
-      } else {
-        throw new Error('Runner script not found at /runner-scripts/runner.sh');
+      const sourceRunnerPath = fs.existsSync(dockerMountedRunnerPath)
+        ? dockerMountedRunnerPath
+        : (fs.existsSync(localRunnerPath) ? localRunnerPath : null);
+
+      if (!sourceRunnerPath) {
+        throw new Error('Runner script not found at /runner-scripts/runner.sh or runner-scripts/runner.sh');
       }
+
+      fs.copyFileSync(sourceRunnerPath, jobRunnerPath);
+      fs.chmodSync(jobRunnerPath, 0o755);
 
       const image = this.getDockerImage(language);
       await this.ensureImageExists(image);
