@@ -16,7 +16,17 @@ export class DockerRunnerService {
   private docker: Docker;
 
   constructor() {
-    this.docker = new Docker();
+    // Prefer Unix socket if available (common in Docker Desktop WSL2 and Linux containers)
+    const unixSocketPath = '/var/run/docker.sock';
+    if (fs.existsSync(unixSocketPath)) {
+      this.docker = new Docker({ socketPath: unixSocketPath });
+    } else if (process.env.DOCKER_HOST) {
+      // Let dockerode parse DOCKER_HOST (e.g., tcp://host:2375 or npipe://...)
+      this.docker = new Docker();
+    } else {
+      // Fallback to defaults; may fail on Windows named pipe when running in WSL/container
+      this.docker = new Docker();
+    }
   }
 
   async run(
