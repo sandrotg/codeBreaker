@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { BullModule } from '@nestjs/bull';
 import { WorkerProcessor } from './worker.processor';
-import { DockerRunnerService } from 'src/infrastructure/docker/docker-runner.service';
 import { MinioService } from 'src/infrastructure/minio/minio.service';
 import { PrismaService } from 'src/infrastructure/prisma.service';
 import { JOBS_REPOSITORY } from 'src/application/tokens';
@@ -13,7 +12,6 @@ import { PrismaJobsRepository } from 'src/infrastructure/jobs/prisma-jobs.reposi
   ],
   providers: [
     WorkerProcessor,
-    DockerRunnerService,
     MinioService,
     PrismaService,
     {
