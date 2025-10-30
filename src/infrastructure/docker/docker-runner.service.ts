@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import Docker from 'dockerode';
 import * as fs from 'fs';
 import * as path from 'path';
+import { spawn } from 'child_process';
 
 export interface RunnerResult {
   output: string;
@@ -169,5 +170,8 @@ export class DockerRunnerService {
     return { stdout, stderr };
   }
 }
+
+export { CodeRunnerRepo };
+// DockerRunnerService se mantiene temporalmente para compatibilidad
 
 

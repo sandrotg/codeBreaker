@@ -1,7 +1,7 @@
 import { Processor, Process } from '@nestjs/bull';
 import type { Job as BullJob } from 'bull';
 import { Inject } from '@nestjs/common';
-import { DockerRunnerService } from 'src/infrastructure/docker/docker-runner.service';
+import { CodeRunnerRepo } from 'src/infrastructure/docker/docker-runner.service';
 import { MinioService } from 'src/infrastructure/minio/minio.service';
 import { JOBS_REPOSITORY } from 'src/application/tokens';
 import type { JobsRepository } from 'src/domain/jobs/repositories/jobs.repository.port';
@@ -16,10 +16,12 @@ interface CodeExecutionJob {
 @Processor('code-execution')
 export class WorkerProcessor {
   constructor(
-    private readonly dockerRunner: DockerRunnerService,
     private readonly minio: MinioService,
     @Inject(JOBS_REPOSITORY) private readonly jobsRepo: JobsRepository,
-  ) {}
+  ) {
+    this.codeRunner = new CodeRunnerRepo();
+  }
+  private readonly codeRunner: CodeRunnerRepo;
 
   @Process()
   async handleCodeExecution(job: BullJob<CodeExecutionJob>) {
@@ -32,7 +34,7 @@ export class WorkerProcessor {
       const inputData = inputBuffer.toString('utf-8');
       const fileName = fileKey.split('/').pop() as string;
 
-      const result = await this.dockerRunner.run(language, codeBuffer, fileName, inputData);
+      const result = await this.codeRunner.run(language, codeBuffer, fileName, inputData);
 
       await this.jobsRepo.updateStatus(jobId, result.exitCode === 0 ? 'COMPLETED' : 'FAILED', {
         output: result.output,
