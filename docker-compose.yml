@@ -63,7 +63,6 @@ services:
         node dist/main.js
       "
     volumes:
-      - .:/usr/src/app
       - /var/run/docker.sock:/var/run/docker.sock
 
   

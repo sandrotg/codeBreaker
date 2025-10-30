@@ -1,49 +1,52 @@
-# ---------- STAGE 1: Development / Build ----------
-FROM node:20-alpine AS development
+# ---------- STAGE 1: Build ----------
+FROM node:20-alpine AS builder
 WORKDIR /usr/src/app
 
-# Instalar Python, C, C++, Java y Node.js
-RUN apk add --no-cache python3 py3-pip gcc g++ openjdk17-jdk nodejs npm
-
-# Copiar archivos base de configuración
+# Copiar archivos de configuración
 COPY package*.json ./
 COPY tsconfig*.json ./
 COPY nest-cli.json ./
 
-# Copiar el código fuente, esquema Prisma y scripts del runner
+# Copiar código fuente y esquema Prisma
 COPY src ./src
 COPY prisma ./prisma
 
-# Instalar dependencias
-RUN npm install
+# Instalar todas las dependencias (incluyendo devDependencies)
+RUN npm ci
 
 # Generar el cliente Prisma
-RUN npx prisma generate --schema=prisma/schema.prisma
+RUN npx prisma generate
 
 # Compilar el proyecto NestJS
-RUN npx nest build
+RUN npm run build
+
+# Verificar que dist se creó correctamente
+RUN ls -la dist/
 
 # ---------- STAGE 2: Production ----------
 FROM node:20-alpine AS production
-ARG NODE_ENV=production
-ENV NODE_ENV=${NODE_ENV}
 WORKDIR /usr/src/app
 
-# Instalar Python, C, C++, Java y Node.js
-RUN apk add --no-cache python3 py3-pip gcc g++ openjdk17-jdk nodejs npm
+# Instalar Python, C, C++, Java para ejecutar código de usuarios
+RUN apk add --no-cache python3 py3-pip gcc g++ openjdk17-jdk
 
-# Copiar package files e instalar dependencias de producción
-COPY --from=development /usr/src/app/package*.json ./
-RUN npm install --omit=dev
+# Copiar package files
+COPY package*.json ./
 
-# Copiar el código compilado
-COPY --from=development /usr/src/app/dist ./dist
+# Instalar solo dependencias de producción
+RUN npm ci --omit=dev
 
-# Copiar el cliente Prisma generado
-COPY --from=development /usr/src/app/node_modules/.prisma ./node_modules/.prisma
+# Copiar el esquema Prisma
+COPY prisma ./prisma
 
-# Copiar el esquema Prisma (por si se usa en runtime)
-COPY --from=development /usr/src/app/prisma ./prisma
+# Generar el cliente Prisma en producción
+RUN npx prisma generate
+
+# Copiar el código compilado desde el stage de build
+COPY --from=builder /usr/src/app/dist ./dist
+
+# Verificar que dist se copió correctamente
+RUN ls -la dist/ && test -f dist/main.js || (echo "ERROR: dist/main.js not found!" && exit 1)
 
 EXPOSE 3000
 CMD ["node", "dist/main.js"]
