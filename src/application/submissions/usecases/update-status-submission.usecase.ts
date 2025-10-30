@@ -16,9 +16,9 @@ export class UpdateStatusSubmissionUseCase {
             checkSubmission.language,
             input.status,
             checkSubmission.createdAt,
-            input.score,
-            input.timeMsTotal,
-            input.cases
+            input.score?? checkSubmission.score,
+            input.timeMsTotal?? checkSubmission.timeMsTotal,
+            input.cases?? checkSubmission.cases
         );
         return await this.submissionPort.updateStatus(newSubmission)
     }

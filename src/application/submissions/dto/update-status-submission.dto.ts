@@ -20,14 +20,14 @@ export class UpdateStatusSubmissionDto {
     @ApiProperty({ example: 100, description: 'Score obtained' })
     @IsInt()
     @IsNotEmpty()
-    score: number;
+    score?: number;
 
     @ApiProperty({ example: 1234, description: 'Total time in milliseconds' })
     @IsInt()
     @IsNotEmpty()
-    timeMsTotal: number;
+    timeMsTotal?: number;
 
     @ApiProperty({ type: () => CasesResult, isArray: true, description: 'Results for each test case' })
     @IsNotEmpty()
-    cases: CasesResult[];
+    cases?: CasesResult[];
 }
