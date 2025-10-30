@@ -73,14 +73,6 @@ model Submission {
   challenge         Challenge @relation(fields:[challengeId], references:[challengeId])
 }
 
-// ===== Code Execution Models =====
-enum JobStatus {
-  QUEUED
-  PROCESSING
-  COMPLETED
-  FAILED
-}
-
 model Job {
   id            String    @id
   fileKey       String
@@ -136,4 +128,11 @@ enum StatusSubmission {
 enum roleName {
   Admin
   Student
+}
+
+enum JobStatus {
+  QUEUED
+  PROCESSING
+  COMPLETED
+  FAILED
 }
