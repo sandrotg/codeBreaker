@@ -22,17 +22,23 @@
   "dependencies": {
     "@nestjs/common": "^11.0.1",
     "@nestjs/config": "^4.0.2",
+    "@nestjs/bull": "^11.0.0",
     "@nestjs/core": "^11.0.1",
     "@nestjs/jwt": "^11.0.1",
     "@nestjs/platform-express": "^11.0.1",
     "@nestjs/swagger": "^11.2.1",
     "@prisma/client": "^6.18.0",
+    "@aws-sdk/client-s3": "^3.527.0",
+    "@aws-sdk/s3-request-presigner": "^3.527.0",
+    "bull": "^4.12.0",
     "bcrypt": "^6.0.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.2",
+    "dockerode": "^4.0.2",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
-    "swagger": "^0.7.5"
+    "swagger": "^0.7.5",
+    "uuid": "^9.0.1"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",
