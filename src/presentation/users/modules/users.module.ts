@@ -16,6 +16,7 @@ import { LoginUseCase } from "src/application/auth/use-cases/login.use-case";
 import { CreateUserUseCase } from "src/application/users/use-cases/createUser.use-case";
 import { GetUserUseCase } from "src/application/users/use-cases/get-user.use-case";
 import { UpdateUserUseCase } from "src/application/users/use-cases/updateUser.use-case";
+import { RefreshTokenUseCase } from "src/application/auth/use-cases/refresh-token.use-case";
 
 @Module({
   imports: [
@@ -49,7 +50,13 @@ import { UpdateUserUseCase } from "src/application/users/use-cases/updateUser.us
         new LoginUseCase(repo, token),
       inject: [USER_REPOSITORY, TOKEN_SERVICE],
     },
-        {
+    {
+      provide: RefreshTokenUseCase,
+      useFactory: (repo: UserRepository, token: TokenServicePort) =>
+        new RefreshTokenUseCase(repo, token),
+      inject: [USER_REPOSITORY, TOKEN_SERVICE],
+    },
+    {
       provide: CreateUserUseCase,
       useFactory: (repo: UserRepository) => new CreateUserUseCase(repo),
       inject: [USER_REPOSITORY],

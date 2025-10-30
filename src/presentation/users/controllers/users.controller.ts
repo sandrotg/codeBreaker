@@ -1,13 +1,17 @@
 import { Controller, Get, Post, Body, Param, Query, ParseIntPipe } from '@nestjs/common';
-import { ApiOkResponse, ApiOperation } from '@nestjs/swagger';
+import { ApiOkResponse, ApiOperation, ApiUnauthorizedResponse } from '@nestjs/swagger';
 import { LoginDto } from 'src/application/auth/dto/login.dto';
 import { LoginUseCase } from 'src/application/auth/use-cases/login.use-case';
 import { CreateUserDto } from 'src/application/users/dto/createUser.dto';
 import { UpdateUserDto } from 'src/application/users/dto/updateUser.dto';
+import { RefreshTokenDTO } from 'src/application/auth/dto/refresh-token.dto';
 import { CreateUserUseCase } from 'src/application/users/use-cases/createUser.use-case';
 import { GetUserUseCase } from 'src/application/users/use-cases/get-user.use-case';
 import { UpdateUserUseCase } from 'src/application/users/use-cases/updateUser.use-case';
+import { RefreshTokenUseCase } from 'src/application/auth/use-cases/refresh-token.use-case';
+import { TokenPair } from 'src/domain/auth/token.repository.port';
 import { User } from 'src/domain/users/entities/user.entity';
+
 
 @Controller("users")
 export class UsersController{
@@ -16,17 +20,29 @@ export class UsersController{
     private readonly updateUser: UpdateUserUseCase,
     private readonly getUser: GetUserUseCase,
     private readonly createUser: CreateUserUseCase,
+    private readonly refreshtoken: RefreshTokenUseCase
     
   ){}
     
     @Post ("login")
-    async Login(@Body() body:LoginDto): Promise<{user:User;token:String}> {
+    async Login(@Body() body:LoginDto): Promise<{user:User;token:TokenPair}> {
     const result = await this.login.execute(body);
     return {
       user: result.user as User & { userId: number },
-      token: result.token
+      token: result.tokens
     }
   }
+
+    @Post('refresh-token')
+    async refreshToken(@Body() body: RefreshTokenDTO): Promise <{user:User;token:TokenPair}>{
+      const result = await this.refreshtoken.execute(body);
+      return{
+      user: result.user as User & { userId: number },
+      token: result.tokens
+      }
+    }
+
+
   @Post('/create')
   @ApiOperation({summary:"User Creation"})
   @ApiOkResponse({description: "The user was created correctly "})
