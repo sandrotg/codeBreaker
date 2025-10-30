@@ -27,7 +27,15 @@ export class UpdateStatusSubmissionDto {
     @IsNotEmpty()
     timeMsTotal?: number;
 
-    @ApiProperty({ type: () => CasesResult, isArray: true, description: 'Results for each test case' })
-    @IsNotEmpty()
+    @ApiProperty({
+        type: () => CasesResult,
+        isArray: true,
+        required: false,
+        description: 'Results for each test case (optional)',
+        example: [
+            { caseId: 'case-1', status: 'PASSED', timeMs: 120 },
+            { caseId: 'case-2', status: 'FAILED', timeMs: 300 }
+        ]
+    })
     cases?: CasesResult[];
 }

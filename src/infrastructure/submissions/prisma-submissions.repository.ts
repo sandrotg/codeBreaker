@@ -7,7 +7,7 @@ import { map } from "rxjs";
 import { CasesResult } from "src/domain/submissions/entities/casesResult.entity";
 
 export class PrismaSubmissionsRepository implements SubmissionRepositoryPort {
-    constructor(private readonly prisma: PrismaService){}
+    constructor(private readonly prisma: PrismaService) { }
 
     async save(submission: Submission): Promise<Submission> {
         const saved = await this.prisma.submission.create({
@@ -37,7 +37,7 @@ export class PrismaSubmissionsRepository implements SubmissionRepositoryPort {
                 cases: true
             }
         });
-        if(!submission) return null;
+        if (!submission) return null;
         return new Submission(
             submission.submissionId,
             submission.user,
@@ -47,7 +47,7 @@ export class PrismaSubmissionsRepository implements SubmissionRepositoryPort {
             submission.createdAt,
             submission.score ?? undefined,
             submission.timeMsTotal ?? undefined,
-            submission.cases.map( m => new CasesResult(m.caseId, m.status, m.timeMs))
+            submission.cases.map(m => new CasesResult(m.caseId, m.status, m.timeMs))
         )
     }
 
@@ -59,14 +59,21 @@ export class PrismaSubmissionsRepository implements SubmissionRepositoryPort {
                 score: submission.score,
                 timeMsTotal: submission.timeMsTotal,
                 cases: {
-                    set: submission.cases?.map( c => ({
-                    caseId: c.caseId,
-                    status: c.status,
-                    timeMs: c.timeMs
-                }))
+                    upsert: submission.cases?.map(c => ({
+                        where: { caseId: c.caseId },
+                        update: {
+                            status: c.status,
+                            timeMs: c.timeMs,
+                        },
+                        create: {
+                            caseId: c.caseId,
+                            status: c.status,
+                            timeMs: c.timeMs,
+                        },
+                    })),
                 }
             },
-            include: {cases:true,}
+            include: { cases: true, }
         });
         return new Submission(
             updated.submissionId,
@@ -77,7 +84,7 @@ export class PrismaSubmissionsRepository implements SubmissionRepositoryPort {
             updated.createdAt,
             updated.score ?? undefined,
             updated.timeMsTotal ?? undefined,
-            updated.cases.map( m => new CasesResult(m.caseId, m.status, m.timeMs))
+            updated.cases.map(m => new CasesResult(m.caseId, m.status, m.timeMs))
         )
     }
 }
