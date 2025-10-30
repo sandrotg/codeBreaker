@@ -12,7 +12,8 @@ export class PrismaUserRepository implements UserRepository{
     async save(user:User): Promise<User>{
         const saved = await this.prisma.user.create({
             data:{
-                username: user.userName,
+                userId: user.userId,
+                userName: user.userName,
                 passwordHash:user.passwordHash,
                 roleId:user.roleId,
                 email: user.email,
@@ -21,7 +22,7 @@ export class PrismaUserRepository implements UserRepository{
         });
         return new User(
             saved.userId,
-            saved.username,
+            saved.userName,
             saved.passwordHash,
             saved.roleId,
             saved.email,
@@ -46,14 +47,14 @@ export class PrismaUserRepository implements UserRepository{
                 userId: user.userId
             },
             data:{
-                username: user.userName,
+                userName: user.userName,
                 passwordHash:user.passwordHash,
                 email: user.email,
             }
         })
         return new User(
             updatedUser.userId,
-            updatedUser.username,
+            updatedUser.userName,
             updatedUser.passwordHash,
             updatedUser.roleId,
             updatedUser.email,

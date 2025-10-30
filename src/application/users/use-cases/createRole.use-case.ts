@@ -14,9 +14,7 @@ export class CreateRoleUseCase{
     async execute(roleInput: CreateRoleDto ): Promise<Role>{
         const role = new Role(
             randomUUID(),
-            roleInput.name,
-            roleInput.permissions? [roleInput.permissions]:[]    // si viene un permiso, lo metemos en array
-  
+            roleInput.name,   
         );
 
         return this.roleRepo.save(role);

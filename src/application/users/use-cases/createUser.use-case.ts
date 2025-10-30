@@ -20,10 +20,10 @@ export class CreateUserUseCase {
     const passwordHash = await bcrypt.hash(userInput.password, 10)
     const user = new User(
       randomUUID(),
-      userInput.username,
+      userInput.userName,
+      userInput.email,
       passwordHash,
       userInput.roleId,
-      userInput.email,
       new Date()
     );
     return this.userRepo.save(user);

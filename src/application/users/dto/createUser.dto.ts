@@ -9,7 +9,7 @@ export class CreateUserDto {
     })
     @IsString()
     @IsNotEmpty()
-    username: string;
+    userName: string;
 
     @ApiProperty({
         description: "Password for registration",

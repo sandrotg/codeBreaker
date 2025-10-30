@@ -9,6 +9,7 @@ import { GetUserUseCase } from 'src/application/users/use-cases/get-user.use-cas
 import { UpdateUserUseCase } from 'src/application/users/use-cases/updateUser.use-case';
 import { User } from 'src/domain/users/entities/user.entity';
 
+@Controller("users")
 export class UsersController{
   constructor(
     private readonly login: LoginUseCase,
@@ -17,7 +18,7 @@ export class UsersController{
     private readonly createUser: CreateUserUseCase,
     
   ){}
-
+    
     @Post ("login")
     async Login(@Body() body:LoginDto): Promise<{user:User;token:String}> {
     const result = await this.login.execute(body);
@@ -31,7 +32,7 @@ export class UsersController{
   @ApiOkResponse({description: "The user was created correctly "})
   async create(@Body() body: CreateUserDto){
     const user = await this.createUser.execute({
-      username: body.username,
+      userName: body.userName,
       password: body.password,
       roleId: body.roleId,
       email: body.email

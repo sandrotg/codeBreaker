@@ -6,5 +6,6 @@ export class User {
     public readonly passwordHash: string,
     public readonly roleId: string,
     public readonly createdAt: Date
+    
   ) { }
 }
