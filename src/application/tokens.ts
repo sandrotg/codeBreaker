@@ -3,3 +3,5 @@ export const ROLE_REPOSITORY = Symbol('ROLE_REPOSITORY');
 export const TOKEN_SERVICE = Symbol('TOKEN_SERVICE');
 export const CHALLENGE_REPOSITORY = Symbol('CHALLENGE_REPOSITORY');
 export const TESTCASE_REPOSITORY = Symbol('TESTCASE_REPOSITORY');
+export const JOBS_REPOSITORY = Symbol('JOBS_REPOSITORY');
+export const CODE_QUEUE = Symbol('CODE_QUEUE');

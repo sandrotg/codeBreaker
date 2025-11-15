@@ -2,12 +2,15 @@
 FROM node:20-alpine AS development
 WORKDIR /usr/src/app
 
+# Instalar Python, C, C++, Java y Node.js
+RUN apk add --no-cache python3 py3-pip gcc g++ openjdk17-jdk nodejs npm
+
 # Copiar archivos base de configuración
 COPY package*.json ./
 COPY tsconfig*.json ./
 COPY nest-cli.json ./
 
-# Copiar el código fuente y el esquema Prisma
+# Copiar el código fuente, esquema Prisma y scripts del runner
 COPY src ./src
 COPY prisma ./prisma
 
@@ -25,6 +28,9 @@ FROM node:20-alpine AS production
 ARG NODE_ENV=production
 ENV NODE_ENV=${NODE_ENV}
 WORKDIR /usr/src/app
+
+# Instalar Python, C, C++, Java y Node.js
+RUN apk add --no-cache python3 py3-pip gcc g++ openjdk17-jdk nodejs npm
 
 # Copiar package files e instalar dependencias de producción
 COPY --from=development /usr/src/app/package*.json ./
