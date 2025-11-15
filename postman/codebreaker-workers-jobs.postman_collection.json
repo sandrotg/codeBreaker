@@ -1,0 +1,193 @@
+{
+  "info": {
+    "name": "CodeBreaker - Workers & Jobs",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_postman_id": "8e6d52c2-8fb1-4b38-9e0b-collection-workers-jobs"
+  },
+  "item": [
+    {
+      "name": "Generate presigned URL (code file)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/upload/generate-url",
+          "host": ["{{baseUrl}}"],
+          "path": ["upload", "generate-url"]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"fileName\": \"{{codeFileName}}\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
+              "var json = pm.response.json();",
+              "pm.collectionVariables.set('codePresignedUrl', json.data.presignedUrl);",
+              "pm.collectionVariables.set('codeObjectKey', json.data.objectKey);"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Upload code to S3 (PUT presigned)",
+      "request": {
+        "method": "PUT",
+        "header": [],
+        "url": {
+          "raw": "{{codePresignedUrl}}",
+          "host": ["{{codePresignedUrl}}"]
+        },
+        "body": {
+          "mode": "file",
+          "file": { "src": "{{codeFilePath}}" }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Upload success (2xx)', function () { pm.expect(pm.response.code).to.be.within(200, 299); });"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Generate presigned URL (input .txt)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/upload/generate-url",
+          "host": ["{{baseUrl}}"],
+          "path": ["upload", "generate-url"]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"fileName\": \"{{inputFileName}}\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
+              "var json = pm.response.json();",
+              "pm.collectionVariables.set('inputPresignedUrl', json.data.presignedUrl);",
+              "pm.collectionVariables.set('inputObjectKey', json.data.objectKey);"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Upload input to S3 (PUT presigned)",
+      "request": {
+        "method": "PUT",
+        "header": [],
+        "url": {
+          "raw": "{{inputPresignedUrl}}",
+          "host": ["{{inputPresignedUrl}}"]
+        },
+        "body": {
+          "mode": "file",
+          "file": { "src": "{{inputFilePath}}" }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Upload success (2xx)', function () { pm.expect(pm.response.code).to.be.within(200, 299); });"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Submit job",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/jobs/submit",
+          "host": ["{{baseUrl}}"],
+          "path": ["jobs", "submit"]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"fileKey\": \"{{codeObjectKey}}\",\n  \"inputKey\": \"{{inputObjectKey}}\",\n  \"language\": \"{{language}}\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status 201/200', function () { pm.expect([200,201]).to.include(pm.response.code); });",
+              "var json = pm.response.json();",
+              "pm.collectionVariables.set('jobId', json.data.id);"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Get job by id",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/jobs/{{jobId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["jobs", "{{jobId}}"]
+        }
+      }
+    },
+    {
+      "name": "List jobs",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/jobs",
+          "host": ["{{baseUrl}}"],
+          "path": ["jobs"]
+        }
+      }
+    }
+  ],
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3000" },
+    { "key": "language", "value": "python" },
+    { "key": "codeFileName", "value": "solution.py" },
+    { "key": "inputFileName", "value": "input.txt" },
+    { "key": "codeFilePath", "value": "/absolute/path/to/solution.py" },
+    { "key": "inputFilePath", "value": "/absolute/path/to/input.txt" },
+    { "key": "codePresignedUrl", "value": "" },
+    { "key": "inputPresignedUrl", "value": "" },
+    { "key": "codeObjectKey", "value": "" },
+    { "key": "inputObjectKey", "value": "" },
+    { "key": "jobId", "value": "" }
+  ]
+}
