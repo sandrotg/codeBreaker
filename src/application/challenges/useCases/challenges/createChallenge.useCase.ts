@@ -2,6 +2,7 @@ import { Challenge } from 'src/domain/challenges/entities/challenges.entity';
 import { randomUUID } from 'crypto';
 import { CreateChallengeDto } from '../../dto/challenges/createChallenge.dto';
 import { ChallengeRepository } from 'src/domain/challenges/repositories/challenges.repository';
+import { State } from 'src/domain/challenges/entities/challenges.entity';
 
 export class CreateChallengeUseCase {
     constructor(
@@ -17,7 +18,7 @@ export class CreateChallengeUseCase {
             input.timeLimit,
             input.memoryLimit,
             input.description,
-            input.state
+            State.DRAFT
         );
         return await this.challengesRepo.save(challenge);
     }

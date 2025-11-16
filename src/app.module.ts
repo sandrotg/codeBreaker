@@ -5,6 +5,7 @@ import { TestCaseModule } from './presentation/challenges/modules/testCase.modul
 import { SubmissionModule } from './presentation/submissions/submission.module';
 import { JobsModule } from './presentation/jobs/modules/jobs.module';
 import { WorkerModule } from './worker/worker.module';
+import { EvaluationModule } from './presentation/evaluations/evaluations.module';
 
 @Module({
   imports: [
@@ -15,7 +16,8 @@ import { WorkerModule } from './worker/worker.module';
   TestCaseModule,
   SubmissionModule,
   JobsModule,
-  WorkerModule
+  WorkerModule,
+  EvaluationModule,
   ],
 })
 export class AppModule {}

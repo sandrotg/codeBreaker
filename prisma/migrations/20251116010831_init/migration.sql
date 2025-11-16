@@ -112,8 +112,30 @@ CREATE TABLE "CaseResult" (
     CONSTRAINT "CaseResult_pkey" PRIMARY KEY ("caseId")
 );
 
+-- CreateTable
+CREATE TABLE "Evaluation" (
+    "evaluationId" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "date" TEXT NOT NULL,
+    "duration" INTEGER NOT NULL,
+
+    CONSTRAINT "Evaluation_pkey" PRIMARY KEY ("evaluationId")
+);
+
+-- CreateTable
+CREATE TABLE "EvaluationChallenge" (
+    "id" TEXT NOT NULL,
+    "evaluationId" TEXT NOT NULL,
+    "challengeId" TEXT NOT NULL,
+
+    CONSTRAINT "EvaluationChallenge_pkey" PRIMARY KEY ("id")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "EvaluationChallenge_evaluationId_challengeId_key" ON "EvaluationChallenge"("evaluationId", "challengeId");
 
 -- AddForeignKey
 ALTER TABLE "User" ADD CONSTRAINT "User_roleId_fkey" FOREIGN KEY ("roleId") REFERENCES "Role"("roleId") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -129,3 +151,9 @@ ALTER TABLE "Submission" ADD CONSTRAINT "Submission_challengeId_fkey" FOREIGN KE
 
 -- AddForeignKey
 ALTER TABLE "CaseResult" ADD CONSTRAINT "CaseResult_submissionId_fkey" FOREIGN KEY ("submissionId") REFERENCES "Submission"("submissionId") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "EvaluationChallenge" ADD CONSTRAINT "EvaluationChallenge_evaluationId_fkey" FOREIGN KEY ("evaluationId") REFERENCES "Evaluation"("evaluationId") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "EvaluationChallenge" ADD CONSTRAINT "EvaluationChallenge_challengeId_fkey" FOREIGN KEY ("challengeId") REFERENCES "Challenge"("challengeId") ON DELETE RESTRICT ON UPDATE CASCADE;

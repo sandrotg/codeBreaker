@@ -19,7 +19,7 @@ export class UpdateChallengeUseCase {
                     input.timeLimit ?? challenge.timeLimit,
                     input.memoryLimit ?? challenge.memoryLimit,
                     input.description ?? challenge.description,
-                    input.state ?? challenge.state
+                    challenge.state
                 )
                 return await this.challengesRepo.update(updatedChallenge);
             }

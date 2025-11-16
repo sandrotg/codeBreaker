@@ -50,6 +50,7 @@ model Challenge {
   state             challengeState
   submissions       Submission[]
   testCases         TestCase[]
+  evaluations       EvaluationChallenge[]
 }
 
 model TestCase {
@@ -74,18 +75,18 @@ model Submission {
 }
 
 model Job {
-  id            String    @id
-  fileKey       String
-  inputKey      String
-  language      String
-  status        JobStatus @default(QUEUED)
-  output        String?
-  error         String?
-  exitCode      Int?
-  executionTime Int?
-  memoryUsed    Int?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  id                String    @id
+  fileKey           String
+  inputKey          String
+  language          String
+  status            JobStatus @default(QUEUED)
+  output            String?
+  error             String?
+  exitCode          Int?
+  executionTime     Int?
+  memoryUsed        Int?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
 }
 
 model CaseResult {
@@ -94,6 +95,23 @@ model CaseResult {
   timeMs            Int
   submissionId      String
   submission        Submission  @relation(fields:[submissionId], references:[submissionId])
+}
+
+model Evaluation {
+  evaluationId      String  @id
+  name              String
+  date              String
+  duration          Int
+  challenges        EvaluationChallenge[] 
+}
+
+model EvaluationChallenge {
+  id                String    @id @default(cuid())
+  evaluationId      String
+  challengeId       String
+  evaluation        Evaluation @relation(fields: [evaluationId], references: [evaluationId])
+  challenge         Challenge  @relation(fields: [challengeId], references: [challengeId])
+  @@unique([evaluationId, challengeId])
 }
 
 enum Difficulty {
