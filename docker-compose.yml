@@ -27,7 +27,9 @@ services:
 
   # --- API (NestJS + Prisma) ---
   api:
-    build: .
+    build:
+      context: .
+      target: production
     container_name: nest-api
     restart: unless-stopped
     depends_on:
@@ -35,6 +37,8 @@ services:
       - redis
     ports:
       - "3000:3000"
+    env_file:
+      - .env
     environment:
       DATABASE_URL: "postgresql://postgres:postgres@postgres:5432/appdb?schema=public"
       REDIS_HOST: "redis"
@@ -45,8 +49,20 @@ services:
         npx prisma migrate deploy &&
         node dist/main.js
       "
-    volumes:
-      - .:/usr/src/app
+
+  # --- Frontend (React + Vite) ---
+  web:
+    build:
+      context: ./web
+      target: production
+    container_name: codebreaker-web
+    restart: unless-stopped
+    depends_on:
+      - api
+    ports:
+      - "80:80"
+    environment:
+      VITE_API_URL: "http://localhost:3000"
 
 volumes:
   postgres_data:
