@@ -10,6 +10,15 @@ async function bootstrap() {
     .setTitle('CodeBreaker API')
     .setDescription('The CodeBreaker API description')
     .setVersion('1.0')
+    .addBearerAuth({
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+        name: 'Authorization',
+        description: 'Enter JWT token',
+        in: 'header',
+      },
+      'bearer',)
     .build();
     
   const document = SwaggerModule.createDocument(app, config);
