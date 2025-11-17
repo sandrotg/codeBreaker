@@ -58,19 +58,19 @@ export class ApiService {
 
   // ============ Challenges CRUD ============
   static async getChallenges(): Promise<Challenge[]> {
-    const response = await fetch(`${API_URL}/challenges`);
+    const response = await fetch(`${API_URL}/challenge/list`);
     if (!response.ok) throw new Error('Error al obtener challenges');
     return response.json();
   }
 
   static async getChallengeById(id: string): Promise<Challenge> {
-    const response = await fetch(`${API_URL}/challenges/${id}`);
+    const response = await fetch(`${API_URL}/challenge/find/${id}`);
     if (!response.ok) throw new Error('Error al obtener challenge');
     return response.json();
   }
 
   static async createChallenge(challenge: CreateChallengeDto): Promise<Challenge> {
-    const response = await fetch(`${API_URL}/challenges`, {
+    const response = await fetch(`${API_URL}/challenge/create`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -86,7 +86,7 @@ export class ApiService {
   }
 
   static async updateChallenge(id: string, challenge: Partial<CreateChallengeDto>): Promise<Challenge> {
-    const response = await fetch(`${API_URL}/challenges/${id}`, {
+    const response = await fetch(`${API_URL}/challenge/update/${id}`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
@@ -102,7 +102,7 @@ export class ApiService {
   }
 
   static async deleteChallenge(id: string): Promise<void> {
-    const response = await fetch(`${API_URL}/challenges/${id}`, {
+    const response = await fetch(`${API_URL}/challenge/delete/${id}`, {
       method: 'DELETE',
     });
 
@@ -113,13 +113,13 @@ export class ApiService {
 
   // ============ Test Cases ============
   static async getTestCasesByChallengeId(challengeId: string): Promise<TestCase[]> {
-    const response = await fetch(`${API_URL}/test-cases/challenge/${challengeId}`);
+    const response = await fetch(`${API_URL}/challenge/${challengeId}/testcases`);
     if (!response.ok) throw new Error('Error al obtener test cases');
     return response.json();
   }
 
   static async createTestCase(testCase: Omit<TestCase, 'testCaseId'>): Promise<TestCase> {
-    const response = await fetch(`${API_URL}/test-cases`, {
+    const response = await fetch(`${API_URL}/testcase/create`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -135,7 +135,7 @@ export class ApiService {
   }
 
   static async deleteTestCase(id: string): Promise<void> {
-    const response = await fetch(`${API_URL}/test-cases/${id}`, {
+    const response = await fetch(`${API_URL}/testcase/delete/${id}`, {
       method: 'DELETE',
     });
 

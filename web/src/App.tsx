@@ -4,6 +4,7 @@ import { Navbar } from './components/Navbar';
 import { HomePage } from './pages/HomePage';
 import { ChallengesListPage } from './pages/ChallengesListPage';
 import { ChallengeDetailPage } from './pages/ChallengeDetailPage';
+import { CreateChallengePage } from './pages/CreateChallengePage';
 import { AIGeneratePage } from './pages/AIGeneratePage';
 import { SubmissionsPage } from './pages/SubmissionsPage';
 import { LoginPage } from './pages/LoginPage';
@@ -20,6 +21,7 @@ function App() {
             <Routes>
               <Route path="/" element={<HomePage />} />
               <Route path="/challenges" element={<ChallengesListPage />} />
+              <Route path="/challenges/create" element={<CreateChallengePage />} />
               <Route path="/challenges/:id" element={<ChallengeDetailPage />} />
               <Route path="/ai-generate" element={<AIGeneratePage />} />
               <Route path="/submissions" element={<SubmissionsPage />} />

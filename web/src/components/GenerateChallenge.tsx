@@ -17,6 +17,7 @@ export function GenerateChallenge() {
 
     try {
       const challenge = await ApiService.generateChallenge(theme);
+      console.log(challenge)
       setGeneratedChallenge(challenge);
     } catch (err) {
       setError('Error al generar el challenge. Verifica que el backend esté corriendo.');

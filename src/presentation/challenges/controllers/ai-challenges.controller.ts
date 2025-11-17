@@ -1,7 +1,7 @@
 import { Body, Controller, Post } from "@nestjs/common";
-import { GenerateChallengeUseCase } from "../../../modules/ai-challenges/application/use-cases/generate-challenge.use-case";
-import { GenerateChallengeDto } from "../../../modules/ai-challenges/presentation/dtos/generate-challenge.dto";
-import { ChallengeResponse } from "../../../modules/ai-challenges/presentation/dtos/response.dto";
+import { GenerateChallengeUseCase } from "../../../application/challenges/useCases/challenges/generate-challenge.use-case";
+import { GenerateChallengeDto } from "../dtos/generate-challenge.dto";
+import { ChallengeResponse } from "../dtos/response.dto";
 
 @Controller('ai-challenges')
 export class AIChallengesController {

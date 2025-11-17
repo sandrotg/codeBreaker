@@ -48,7 +48,22 @@ export function ChallengeEditor({ generatedChallenge, onCancel }: Props) {
         memoryLimit: Number(formData.memoryLimit),
       };
 
-      await ApiService.createChallenge(challengeData);
+      // 1. Crear el challenge
+      const createdChallenge = await ApiService.createChallenge(challengeData);
+
+      // 2. Crear los test cases del challenge generado
+      if (generatedChallenge.examples && generatedChallenge.examples.length > 0) {
+        await Promise.all(
+          generatedChallenge.examples.map(example =>
+            ApiService.createTestCase({
+              challengeId: createdChallenge.challengeId,
+              input: example.input,
+              output: example.output,
+            })
+          )
+        );
+      }
+
       setSuccess(true);
       setTimeout(() => {
         onCancel(); // Volver al inicio después de guardar

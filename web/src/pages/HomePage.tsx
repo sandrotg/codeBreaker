@@ -6,7 +6,7 @@ export function HomePage() {
   return (
     <div className="home-page">
       <section className="hero">
-        <h1>🎯 Bienvenido a CodeBreaker</h1>
+        <h1> Bienvenido a CodeBreaker</h1>
         <p className="hero-subtitle">
           Plataforma de challenges de programación con IA
         </p>

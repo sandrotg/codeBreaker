@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
-import { GenerateChallengeUseCase } from '../../../modules/ai-challenges/application/use-cases/generate-challenge.use-case';
-import { GptProviderService } from '../../../modules/ai-challenges/infrastructure/adapters/gpt-provider.service';
-import { OllamaValidatorService } from '../../../modules/ai-challenges/infrastructure/adapters/ollama-validator.service';
+import { GenerateChallengeUseCase } from '../../../application/challenges/useCases/challenges/generate-challenge.use-case';
+import { GptProviderService } from '../../../infrastructure/challenges/gpt-provider.service';
+import { OllamaValidatorService } from '../../../infrastructure/challenges/ollama-validator.service';
 import { AIChallengesController } from '../controllers/ai-challenges.controller';
 
 @Module({
