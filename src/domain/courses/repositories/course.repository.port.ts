@@ -1,10 +1,11 @@
+import { User } from "src/domain/users/entities/user.entity";
 import { Course } from "../entities/course.entity";
 import { UserCourse } from "../entities/user-course.entity";
 
 export interface CourseRepositoryPort {
-    save(emailCreator: string, course: Course): Promise<Course>;
+    save(admin: User, course: Course): Promise<Course>;
     //remove(nrc: number): Promise<void>;
-    addUsers(nrc: number, emails: string[]): Promise<void>;
+    addUsers(course: Course, users: User[]): Promise<void>;
     getAllUsers(nrc: number): Promise<UserCourse[] | null>;
     //removeUser(nrc: number, email: string): Promise<void>;
     getByNrc(nrc: number): Promise<Course | null>;

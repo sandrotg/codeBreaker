@@ -7,7 +7,7 @@ export class Course{
         public readonly title: string,
         public readonly nrc: number,
         public readonly period: string,
-        public readonly Group: number,
+        public readonly group: number,
         public readonly users?: UserCourse[],
         public readonly challenges?: Challenge[],
         //public readonly evaluations?: Evaluation[]

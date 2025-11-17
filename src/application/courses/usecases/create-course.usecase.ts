@@ -18,6 +18,6 @@ export class createCourseUsecase {
             course.period,
             course.group
         );
-        return await this.courseRepository.save(course.creatorEmail, newCourse);
+        return await this.courseRepository.save(creator, newCourse);
     }
 }
