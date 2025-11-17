@@ -73,6 +73,21 @@ model Submission {
   challenge         Challenge @relation(fields:[challengeId], references:[challengeId])
 }
 
+model Job {
+  id            String    @id
+  fileKey       String
+  inputKey      String
+  language      String
+  status        JobStatus @default(QUEUED)
+  output        String?
+  error         String?
+  exitCode      Int?
+  executionTime Int?
+  memoryUsed    Int?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
 model CaseResult {
   caseId            String  @id
   status            String
@@ -113,4 +128,11 @@ enum StatusSubmission {
 enum roleName {
   Admin
   Student
+}
+
+enum JobStatus {
+  QUEUED
+  PROCESSING
+  COMPLETED
+  FAILED
 }

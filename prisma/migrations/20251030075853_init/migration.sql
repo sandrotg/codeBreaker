@@ -13,6 +13,9 @@ CREATE TYPE "StatusSubmission" AS ENUM ('QUEUED', 'RUNNING', 'ACCEPTED', 'WRONG_
 -- CreateEnum
 CREATE TYPE "roleName" AS ENUM ('Admin', 'Student');
 
+-- CreateEnum
+CREATE TYPE "JobStatus" AS ENUM ('QUEUED', 'PROCESSING', 'COMPLETED', 'FAILED');
+
 -- CreateTable
 CREATE TABLE "User" (
     "userId" TEXT NOT NULL,
@@ -79,6 +82,24 @@ CREATE TABLE "Submission" (
     "timeMsTotal" INTEGER,
 
     CONSTRAINT "Submission_pkey" PRIMARY KEY ("submissionId")
+);
+
+-- CreateTable
+CREATE TABLE "Job" (
+    "id" TEXT NOT NULL,
+    "fileKey" TEXT NOT NULL,
+    "inputKey" TEXT NOT NULL,
+    "language" TEXT NOT NULL,
+    "status" "JobStatus" NOT NULL DEFAULT 'QUEUED',
+    "output" TEXT,
+    "error" TEXT,
+    "exitCode" INTEGER,
+    "executionTime" INTEGER,
+    "memoryUsed" INTEGER,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "Job_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable

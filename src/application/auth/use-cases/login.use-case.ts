@@ -1,7 +1,7 @@
 import { Inject, Injectable } from "@nestjs/common";
 import type { UserRepository } from "src/domain/users/repositories/user.repository.port";
 import { User } from "src/domain/users/entities/user.entity";
-import type { TokenServicePort } from "src/domain/auth/token.repository.port";
+import type { TokenPair, TokenServicePort } from "src/domain/auth/token.repository.port";
 import { LoginDto } from "../dto/login.dto";
 import { TOKEN_SERVICE,USER_REPOSITORY } from "src/application/tokens";
 import * as bcrypt from "bcrypt";
@@ -17,7 +17,7 @@ export class LoginUseCase {
     private readonly tokenService: TokenServicePort
   ) {}
 
-  async execute(loginInput: LoginDto): Promise<{ user: User; token: string }> {
+  async execute(loginInput: LoginDto): Promise<{ user: User; tokens: TokenPair }> {
     // 1. Buscar usuario
     const user = await this.userRepo.findUserByEmail(loginInput.email);
     if (!user) {
@@ -32,16 +32,16 @@ export class LoginUseCase {
 
     // 3. Crear el payload del token
     const payload: TokenPayload = {
-      sub: user.userId!.toString(),
+      sub: user.userId!,
       email: user.email,
-      roleId: user.roleId.toString(),
+      roleId: user.roleId
     };
 
     // 4. Generar token
-    const accessToken = this.tokenService.generateAccessToken(payload);
+    const TokenPair = this.tokenService.generateTokenPair(payload);
 
     // 5. Retornar datos
     return {
-      user,token: accessToken};
+      user,tokens: TokenPair};
   }
 }
