@@ -11,11 +11,17 @@ export class CreateRoleUseCase{
        @Inject(ROLE_REPOSITORY) private readonly roleRepo: RoleRepository
     ){}
 
+
+
     async execute(roleInput: CreateRoleDto ): Promise<Role>{
         const role = new Role(
             randomUUID(),
             roleInput.name,   
         );
+
+        
+
+        console.log(roleInput.name)
 
         return this.roleRepo.save(role);
     }

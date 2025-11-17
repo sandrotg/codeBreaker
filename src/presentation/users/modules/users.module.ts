@@ -3,7 +3,7 @@ import { JwtModule } from "@nestjs/jwt";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 
 import { UsersController } from "../controllers/users.controller";
-import { TOKEN_SERVICE,USER_REPOSITORY } from "src/application/tokens";
+import { ROLE_REPOSITORY, TOKEN_SERVICE,USER_REPOSITORY } from "src/application/tokens";
 import { UserRepository } from "src/domain/users/repositories/user.repository.port";
 import { TokenServicePort } from "src/domain/auth/token.repository.port";
 
@@ -17,10 +17,15 @@ import { CreateUserUseCase } from "src/application/users/use-cases/createUser.us
 import { GetUserUseCase } from "src/application/users/use-cases/get-user.use-case";
 import { UpdateUserUseCase } from "src/application/users/use-cases/updateUser.use-case";
 import { RefreshTokenUseCase } from "src/application/auth/use-cases/refresh-token.use-case";
+import { JwtStrategy } from "src/presentation/shared/strategies/jwt.strategy";
+
+import { PassportModule } from "@nestjs/passport";
+import { PrismaRoleRepository } from "src/infrastructure/users/database/prisma-role.repository";
 
 @Module({
   imports: [
 
+    PassportModule.register({ defaultStrategy: 'jwt' }),
     // 👇 Usa ConfigService para leer el secret después de cargar el .env
     JwtModule.registerAsync({
       imports: [ConfigModule],
@@ -34,6 +39,9 @@ import { RefreshTokenUseCase } from "src/application/auth/use-cases/refresh-toke
   controllers: [UsersController],
   providers: [
     PrismaService,
+    JwtStrategy,
+
+
 
     {
       provide: USER_REPOSITORY,
@@ -43,6 +51,12 @@ import { RefreshTokenUseCase } from "src/application/auth/use-cases/refresh-toke
     {
       provide: TOKEN_SERVICE,
       useClass: JwtTokenService,
+    },
+
+    {
+      provide: ROLE_REPOSITORY,
+      useClass: PrismaRoleRepository
+
     },
     {
       provide: LoginUseCase,

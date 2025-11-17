@@ -1,5 +1,5 @@
-import { Controller, Get, Post, Body, Param, Query, ParseIntPipe } from '@nestjs/common';
-import { ApiOkResponse, ApiOperation, ApiUnauthorizedResponse } from '@nestjs/swagger';
+import { Controller, Get, Post, Body, Param } from '@nestjs/common';
+import { ApiOkResponse, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { LoginDto } from 'src/application/auth/dto/login.dto';
 import { LoginUseCase } from 'src/application/auth/use-cases/login.use-case';
 import { CreateUserDto } from 'src/application/users/dto/createUser.dto';
@@ -11,87 +11,76 @@ import { UpdateUserUseCase } from 'src/application/users/use-cases/updateUser.us
 import { RefreshTokenUseCase } from 'src/application/auth/use-cases/refresh-token.use-case';
 import { TokenPair } from 'src/domain/auth/token.repository.port';
 import { User } from 'src/domain/users/entities/user.entity';
-
+import { UseGuards } from '@nestjs/common';
+import { JwtAuthGuard } from 'src/presentation/shared/guards/jwt-auth.guard';
+import { RolesGuard } from 'src/presentation/shared/guards/roles.guard';
+import { Roles } from 'src/presentation/shared/decorators/roles.decorator';
+import { roleName } from 'src/domain/users/entities/role.entity';
 
 @Controller("users")
-export class UsersController{
+export class UsersController {
   constructor(
     private readonly login: LoginUseCase,
     private readonly updateUser: UpdateUserUseCase,
     private readonly getUser: GetUserUseCase,
     private readonly createUser: CreateUserUseCase,
     private readonly refreshtoken: RefreshTokenUseCase
-    
-  ){}
-    
-    @Post ("login")
-    async Login(@Body() body:LoginDto): Promise<{user:User;token:TokenPair}> {
+  ) {}
+
+  // 🟢 PÚBLICO
+  @Post("login")
+  async Login(@Body() body: LoginDto) {
     const result = await this.login.execute(body);
-    return {
-      user: result.user as User & { userId: number },
-      token: result.tokens
-    }
+    return { user: result.user, token: result.tokens };
   }
 
-    @Post('refresh-token')
-    async refreshToken(@Body() body: RefreshTokenDTO): Promise <{user:User;token:TokenPair}>{
-      const result = await this.refreshtoken.execute(body);
-      return{
-      user: result.user as User & { userId: number },
-      token: result.tokens
-      }
-    }
+  // 🟢 PÚBLICO
+  @Post('refresh-token')
+  async refreshToken(@Body() body: RefreshTokenDTO) {
+    const result = await this.refreshtoken.execute(body);
+    return { user: result.user, token: result.tokens };
+  }
 
-
+  // 🟢 O 🟡 DEPENDE DE TI
+  // Si solo admin crea usuarios, agrega Roles y guard.
+  // Si quieres registro público, déjalo así.
   @Post('/create')
-  @ApiOperation({summary:"User Creation"})
-  @ApiOkResponse({description: "The user was created correctly "})
-  async create(@Body() body: CreateUserDto){
-    const user = await this.createUser.execute({
-      userName: body.userName,
-      password: body.password,
-      roleId: body.roleId,
-      email: body.email
-    })
-    return user;
+  async create(@Body() body: CreateUserDto) {
+    return this.createUser.execute(body);
   }
 
+  // 🔐 PROTEGIDO
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(roleName.ADMIN, roleName.STUDENT)
   @Post('/update/:id')
-  @ApiOperation({summary:"Update User"})
-  @ApiOkResponse({description:"User updated correctly"})
-
-  async update(@Param('id') id: string, @Body() body: UpdateUserDto){
-    const updatedUser = await this.updateUser.execute({
+  async update(@Param('id') id: string, @Body() body: UpdateUserDto) {
+    return this.updateUser.execute({
       userId: id,
       email: body.email,
       username: body.username,
       password: body.password
-    })
-    return updatedUser;
+    });
   }
 
+  // 🔐 PROTEGIDO
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(roleName.STUDENT)
+  @ApiBearerAuth()
   @Get('/:id')
-  @ApiOperation({summary: "Find Id"})
-  @ApiOkResponse({description:"User Found Correctly"})
-  async GetUserById(@Param('id') id: string){
-    const user = await this.getUser.execute({
-      userId: id,
-      criteria: 'id'
-    })
-    return user
+  async GetUserById(@Param('id') id: string) {
+    return this.getUser.execute({ userId: id, criteria: 'id' });
   }
 
-  @ApiOperation({summary:"Find Email"})
-  @ApiOkResponse({description:"User Found Correctly"})
+  // 🔐 PROTEGIDO
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(roleName.ADMIN)
   @Get('/email/:email')
-  async GetUserByEmail(@Param("email") email: string){
-    const user = await this.getUser.execute({
-      email: email,
-      criteria: 'email'
-    })
-    return user
+  async GetUserByEmail(@Param("email") email: string) {
+    return this.getUser.execute({ email, criteria: 'email' });
   }
 }
+
+
 
   
 
