@@ -9,8 +9,10 @@ export class GetEvaluationUseCase {
 
         const evaluation = await this.evaluationRepo.findEvaluationById(id);
         if (!evaluation) throw new Error("Not found");
-
-        const now = new Date();
+        
+        const nowUTC = new Date();
+        const offsetMinutes = 5 * 60;
+        const now = new Date(nowUTC.getTime() - offsetMinutes * 60 * 1000)
         const start = new Date(evaluation.startAt);
         const expiresAt = new Date(start.getTime() + evaluation.duration * 60 * 1000);
         let startsIn: number | undefined;
@@ -37,7 +39,7 @@ export class GetEvaluationUseCase {
             durationMinutes: evaluation.duration,
             state,
             expiresAt,
-            startsIn,
+            startsIn
         };
 
     }
