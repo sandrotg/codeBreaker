@@ -142,9 +142,10 @@ model CaseResult {
 model Evaluation {
   evaluationId      String  @id
   name              String
-  date              String
+  startAt           DateTime
   duration          Int
   challenges        EvaluationChallenge[] 
+  createdAt         DateTime @default(now())
   courses           EvaluationCourse[]
 }
 

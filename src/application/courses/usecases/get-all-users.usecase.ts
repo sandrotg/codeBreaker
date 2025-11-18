@@ -5,9 +5,9 @@ import { CourseRepositoryPort } from "src/domain/courses/repositories/course.rep
 export class GetAllUsersInCourseUseCase {
     constructor(private readonly courseRepository: CourseRepositoryPort) {}
 
-    async execute(nrc: number): Promise<UserCourse[] | null>{
+    async execute(nrc: number): Promise<UserCourse[]>{
         const course = await this.courseRepository.getByNrc(nrc);
         if(!course)throw new NotFoundException('Course not found');
-        return this.courseRepository.getAllUsers(nrc);
+        return this.courseRepository.getAllUsers(course);
     }   
 }

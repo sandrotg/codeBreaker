@@ -4,7 +4,7 @@ import { CourseRepositoryPort } from "src/domain/courses/repositories/course.rep
 export class GetByTitleCourseUseCase {
     constructor(private readonly courseRepository: CourseRepositoryPort) { }
 
-    async execute(title: string): Promise<Course[] | null> {
+    async execute(title: string): Promise<Course[]> {
         return this.courseRepository.getByTitle(title);
     }
 }

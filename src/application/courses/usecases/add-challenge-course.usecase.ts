@@ -10,6 +10,6 @@ export class AddChanllengeToCourseUseCase {
         if (!course) throw new NotFoundException('Course not found');
         const challenge = await this.challengeRepository.findChallengeById(challengeId);
         if (!challenge) throw new NotFoundException('Challenge not found');
-        await this.courseRepository.addChallenge(nrc, challengeId);
+        await this.courseRepository.addChallenge(course, challengeId);
     }
 }
