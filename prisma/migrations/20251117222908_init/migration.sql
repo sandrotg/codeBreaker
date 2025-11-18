@@ -116,8 +116,9 @@ CREATE TABLE "CaseResult" (
 CREATE TABLE "Evaluation" (
     "evaluationId" TEXT NOT NULL,
     "name" TEXT NOT NULL,
-    "date" TEXT NOT NULL,
+    "startAt" TIMESTAMP(3) NOT NULL,
     "duration" INTEGER NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "Evaluation_pkey" PRIMARY KEY ("evaluationId")
 );

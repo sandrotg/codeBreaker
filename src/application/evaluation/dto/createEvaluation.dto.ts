@@ -16,7 +16,7 @@ export class CreateEvaluationDto {
     example: '15 de octubre, 10:00 a.m.',
     description: 'Fecha y hora limite de la evaluacion.',
   })
-  date: string;
+  startAt?: string;
 
   @IsNotEmpty()
   @IsNumber()

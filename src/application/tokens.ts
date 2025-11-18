@@ -6,3 +6,4 @@ export const TESTCASE_REPOSITORY = Symbol('TESTCASE_REPOSITORY');
 export const JOBS_REPOSITORY = Symbol('JOBS_REPOSITORY');
 export const CODE_QUEUE = Symbol('CODE_QUEUE');
 export const EVALUATION_REPOSITORY = Symbol('EVALUATION_REPOSITORY');
+export const DATE_PARSER = Symbol('DATE_PARSER');

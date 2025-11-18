@@ -1,6 +1,6 @@
 import { Module } from "@nestjs/common";
 import { EvaluationController } from "./evaluations.controller";
-import { EVALUATION_REPOSITORY, CHALLENGE_REPOSITORY } from "src/application/tokens";
+import { EVALUATION_REPOSITORY, CHALLENGE_REPOSITORY, DATE_PARSER } from "src/application/tokens";
 import { CreateEvaluationUseCase } from 'src/application/evaluation/useCases/createEvaluation.useCase';
 import { DeleteEvaluationUseCase } from 'src/application/evaluation/useCases/deleteEvaluation.useCase';
 import { PrismaService } from "src/infrastructure/prisma.service";
@@ -8,6 +8,9 @@ import { PrismaEvaluationRepository } from "src/infrastructure/evaluation/prisma
 import { PrismaChallengeRepository } from "src/infrastructure/challenges/prisma-challenge.repository";
 import { EvaluationRepository } from "src/domain/evaluations/repositories/evaluation.repository";
 import { ChallengeRepository } from "src/domain/challenges/repositories/challenges.repository";
+import { DateParser } from "src/domain/shared/date-parser.interface";
+import { dateParser } from "src/infrastructure/date/date-parser";
+import { GetEvaluationUseCase } from "src/application/evaluation/useCases/getEvaluationUseCase";
 
 @Module({
     controllers: [EvaluationController],
@@ -24,13 +27,22 @@ import { ChallengeRepository } from "src/domain/challenges/repositories/challeng
             inject: [PrismaService],
         },
         {
+            provide: DATE_PARSER,
+            useClass: dateParser,
+        },
+        {
             provide: CreateEvaluationUseCase,
-            useFactory: (evaluationRepo: EvaluationRepository, challengeRepo: ChallengeRepository) => new CreateEvaluationUseCase(evaluationRepo, challengeRepo),
-            inject: [EVALUATION_REPOSITORY, CHALLENGE_REPOSITORY],
+            useFactory: (evaluationRepo: EvaluationRepository, challengeRepo: ChallengeRepository, dateParser: DateParser) => new CreateEvaluationUseCase(evaluationRepo, challengeRepo, dateParser),
+            inject: [EVALUATION_REPOSITORY, CHALLENGE_REPOSITORY, DATE_PARSER],
         },
         {
             provide: DeleteEvaluationUseCase,
             useFactory: (evaluationRepo: EvaluationRepository) => new DeleteEvaluationUseCase(evaluationRepo),
+            inject: [EVALUATION_REPOSITORY],
+        },
+        {
+            provide: GetEvaluationUseCase,
+            useFactory: (evaluationRepo: EvaluationRepository) => new GetEvaluationUseCase(evaluationRepo),
             inject: [EVALUATION_REPOSITORY],
         },
     ],
