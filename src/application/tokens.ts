@@ -7,3 +7,5 @@ export const JOBS_REPOSITORY = Symbol('JOBS_REPOSITORY');
 export const CODE_QUEUE = Symbol('CODE_QUEUE');
 export const EVALUATION_REPOSITORY = Symbol('EVALUATION_REPOSITORY');
 export const DATE_PARSER = Symbol('DATE_PARSER');
+export const COURSE_REPOSITORY = Symbol('COURSE_REPOSITORY');
+export const SUBMISSION_REPOSITORY = Symbol('SUBMISSION_REPOSITORY');

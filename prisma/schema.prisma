@@ -22,6 +22,7 @@ model User {
   roleId            String
   createdAt         DateTime @default(now())
   role              Role     @relation(fields:[roleId], references:[roleId])
+  courses           UserCourse[]
 }
 
 model Role {
@@ -29,6 +30,46 @@ model Role {
   name              roleName
   permissions       Permission[]
   user              User[]
+}
+
+model Course {
+  courseId          String  @id
+  title             String
+  nrc               Int   @unique
+  period            String
+  group             Int
+  createdAt         DateTime @default(now())
+  users             UserCourse[]
+  challenges        ChallengeCourse[]
+  evaluations       EvaluationCourse[]
+}
+
+model UserCourse {
+  id                String  @id @default(cuid())
+  userId            String
+  courseId          String
+  score             Int?
+  user              User    @relation(fields:[userId], references:[userId])
+  course            Course  @relation(fields:[courseId], references:[courseId])
+  @@unique([userId, courseId])
+}
+
+model ChallengeCourse {
+  id                String    @id @default(cuid())
+  challengeId       String
+  courseId          String
+  challenge         Challenge @relation(fields:[challengeId], references:[challengeId])
+  course            Course    @relation(fields:[courseId], references:[courseId])
+  @@unique([challengeId, courseId])
+}
+
+model EvaluationCourse {
+  id                String    @id @default(cuid())
+  evaluationId      String
+  courseId          String
+  evaluation        Evaluation @relation(fields:[evaluationId], references:[evaluationId])
+  course            Course     @relation(fields:[courseId], references:[courseId])
+  @@unique([evaluationId, courseId])
 }
 
 model Permission{
@@ -51,6 +92,7 @@ model Challenge {
   submissions       Submission[]
   testCases         TestCase[]
   evaluations       EvaluationChallenge[]
+  courses           ChallengeCourse[]
 }
 
 model TestCase {
@@ -104,6 +146,7 @@ model Evaluation {
   duration          Int
   challenges        EvaluationChallenge[] 
   createdAt         DateTime @default(now())
+  courses           EvaluationCourse[]
 }
 
 model EvaluationChallenge {
