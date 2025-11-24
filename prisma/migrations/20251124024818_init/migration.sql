@@ -37,6 +37,46 @@ CREATE TABLE "Role" (
 );
 
 -- CreateTable
+CREATE TABLE "Course" (
+    "courseId" TEXT NOT NULL,
+    "title" TEXT NOT NULL,
+    "nrc" INTEGER NOT NULL,
+    "period" TEXT NOT NULL,
+    "group" INTEGER NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "Course_pkey" PRIMARY KEY ("courseId")
+);
+
+-- CreateTable
+CREATE TABLE "UserCourse" (
+    "id" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "courseId" TEXT NOT NULL,
+    "score" INTEGER,
+
+    CONSTRAINT "UserCourse_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "ChallengeCourse" (
+    "id" TEXT NOT NULL,
+    "challengeId" TEXT NOT NULL,
+    "courseId" TEXT NOT NULL,
+
+    CONSTRAINT "ChallengeCourse_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "EvaluationCourse" (
+    "id" TEXT NOT NULL,
+    "evaluationId" TEXT NOT NULL,
+    "courseId" TEXT NOT NULL,
+
+    CONSTRAINT "EvaluationCourse_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "Permission" (
     "permissionId" TEXT NOT NULL,
     "roleId" TEXT NOT NULL,
@@ -136,10 +176,40 @@ CREATE TABLE "EvaluationChallenge" (
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "Course_nrc_key" ON "Course"("nrc");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "UserCourse_userId_courseId_key" ON "UserCourse"("userId", "courseId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "ChallengeCourse_challengeId_courseId_key" ON "ChallengeCourse"("challengeId", "courseId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "EvaluationCourse_evaluationId_courseId_key" ON "EvaluationCourse"("evaluationId", "courseId");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "EvaluationChallenge_evaluationId_challengeId_key" ON "EvaluationChallenge"("evaluationId", "challengeId");
 
 -- AddForeignKey
 ALTER TABLE "User" ADD CONSTRAINT "User_roleId_fkey" FOREIGN KEY ("roleId") REFERENCES "Role"("roleId") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "UserCourse" ADD CONSTRAINT "UserCourse_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("userId") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "UserCourse" ADD CONSTRAINT "UserCourse_courseId_fkey" FOREIGN KEY ("courseId") REFERENCES "Course"("courseId") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "ChallengeCourse" ADD CONSTRAINT "ChallengeCourse_challengeId_fkey" FOREIGN KEY ("challengeId") REFERENCES "Challenge"("challengeId") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "ChallengeCourse" ADD CONSTRAINT "ChallengeCourse_courseId_fkey" FOREIGN KEY ("courseId") REFERENCES "Course"("courseId") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "EvaluationCourse" ADD CONSTRAINT "EvaluationCourse_evaluationId_fkey" FOREIGN KEY ("evaluationId") REFERENCES "Evaluation"("evaluationId") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "EvaluationCourse" ADD CONSTRAINT "EvaluationCourse_courseId_fkey" FOREIGN KEY ("courseId") REFERENCES "Course"("courseId") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Permission" ADD CONSTRAINT "Permission_roleId_fkey" FOREIGN KEY ("roleId") REFERENCES "Role"("roleId") ON DELETE RESTRICT ON UPDATE CASCADE;
