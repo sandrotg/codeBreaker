@@ -1,7 +1,7 @@
 import { Course } from "src/domain/courses/entities/course.entity";
 import { CourseRepositoryPort } from "src/domain/courses/repositories/course.repository.port";
 
-export class GetByNrcCourseUseCase {
+export class GetCourseByNrcUseCase {
     constructor(private readonly courseRepository: CourseRepositoryPort) {}
 
     async execute(nrc: number): Promise<Course | null> {

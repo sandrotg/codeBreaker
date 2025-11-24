@@ -81,9 +81,14 @@ export class PrismaCoursesRepository implements CourseRepositoryPort {
 
     async getByTitle(title: string): Promise<Course[]> {
         const courses = await this.prisma.course.findMany({
-            where: { title },
+            where: {
+                title: {
+                    contains: title,
+                    mode: 'insensitive'
+                },
+            }
         });
-        return courses.map(course=> new Course(
+        return courses.map(course => new Course(
             course.courseId,
             course.title,
             course.nrc,
@@ -105,10 +110,10 @@ export class PrismaCoursesRepository implements CourseRepositoryPort {
         const challenges = await this.prisma.challengeCourse.findMany({
             where: { courseId: course.courseId },
             include: {
-                challenge: true,  
+                challenge: true,
             }
         });
-        return challenges.map(c=> new Challenge(
+        return challenges.map(c => new Challenge(
             c.challenge.challengeId,
             c.challenge.title,
             c.challenge.difficulty as Difficulty,
