@@ -54,14 +54,4 @@ export class CreateChallengeDto {
     description: 'Descripción detallada del problema y de lo que se espera resolver.',
   })
   description: string;
-
-  @IsNotEmpty()
-  @IsEnum(State, { message: 'El estado debe ser draft, published o archived.' })
-  @ApiProperty({
-    enum: State,
-    enumName: 'State',
-    example: State.DRAFT,
-    description: 'Estado actual del reto (borrador, publicado o archivado).',
-  })
-  state: State;
 }

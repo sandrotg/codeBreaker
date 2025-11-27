@@ -10,7 +10,7 @@ export class CreateSubmissionDto {
     @IsNotEmpty()
     user: string;
 
-    @ApiProperty({ example: "challenge123", description: "Challenge identifier" })
+    @ApiProperty({ example: "795bbea2-8939-46c9-906c-92505b7f7f2c", description: "Challenge identifier" })
     @IsString()
     @IsNotEmpty()
     challengeId: string;

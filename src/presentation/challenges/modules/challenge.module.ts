@@ -10,6 +10,7 @@ import { ListTestCasesByChallengeIdUseCase } from "src/application/challenges/us
 import { PrismaService } from "src/infrastructure/prisma.service";
 import { PrismaChallengeRepository } from "src/infrastructure/challenges/prisma-challenge.repository";
 import { ChallengeRepository } from "src/domain/challenges/repositories/challenges.repository";
+import { UpdateStateUseCase } from "src/application/challenges/useCases/challenges/updateState.useCase";
 
 @Module({
     controllers: [ChallengeController],
@@ -48,6 +49,11 @@ import { ChallengeRepository } from "src/domain/challenges/repositories/challeng
         {
             provide: ListTestCasesByChallengeIdUseCase,
             useFactory: (challengeRepository: ChallengeRepository) => new ListTestCasesByChallengeIdUseCase(challengeRepository),
+            inject: [CHALLENGE_REPOSITORY],
+        },
+        {
+            provide: UpdateStateUseCase,
+            useFactory: (challengeRepository: ChallengeRepository) => new UpdateStateUseCase(challengeRepository),
             inject: [CHALLENGE_REPOSITORY],
         }
     ],
