@@ -1,0 +1,50 @@
+# KEDA ScaledObject for scaling workers based on Redis queue length
+# Prerequisites: Install KEDA operator in your cluster
+# kubectl apply -f https://github.com/kedacore/keda/releases/download/v2.12.0/keda-2.12.0.yaml
+
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: worker-scaledobject
+  namespace: codebreaker
+spec:
+  scaleTargetRef:
+    name: worker
+  minReplicaCount: 2
+  maxReplicaCount: 20
+  pollingInterval: 15
+  cooldownPeriod: 60
+  triggers:
+  - type: redis
+    metadata:
+      # Redis connection
+      address: redis-service.codebreaker.svc.cluster.local:6379
+      # Bull queue key pattern
+      listName: bull:code-execution:wait
+      # Number of items per replica
+      listLength: "5"
+      # Use TLS if needed
+      # enableTLS: "false"
+    authenticationRef:
+      name: redis-auth
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: redis-auth
+  namespace: codebreaker
+type: Opaque
+stringData:
+  # Leave empty if no password
+  password: ""
+---
+apiVersion: keda.sh/v1alpha1
+kind: TriggerAuthentication
+metadata:
+  name: redis-auth
+  namespace: codebreaker
+spec:
+  secretTargetRef:
+  - parameter: password
+    name: redis-auth
+    key: password

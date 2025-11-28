@@ -1,0 +1,111 @@
+# Template for creating ephemeral Jobs for code execution
+# This is a template - actual Jobs will be created dynamically by the API
+# Each submission creates a new Job with unique submission ID
+
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: submission-{{SUBMISSION_ID}}
+  namespace: codebreaker
+  labels:
+    app: submission-runner
+    submission-id: "{{SUBMISSION_ID}}"
+    challenge-id: "{{CHALLENGE_ID}}"
+spec:
+  # Job will be deleted after 1 hour (3600 seconds)
+  ttlSecondsAfterFinished: 3600
+  backoffLimit: 2
+  activeDeadlineSeconds: 300
+  template:
+    metadata:
+      labels:
+        app: submission-runner
+        submission-id: "{{SUBMISSION_ID}}"
+    spec:
+      restartPolicy: Never
+      serviceAccountName: submission-runner-sa
+      containers:
+      - name: runner
+        image: your-registry/codebreaker-runner:latest
+        env:
+        - name: SUBMISSION_ID
+          value: "{{SUBMISSION_ID}}"
+        - name: CHALLENGE_ID
+          value: "{{CHALLENGE_ID}}"
+        - name: LANGUAGE
+          value: "{{LANGUAGE}}"
+        - name: CODE_FILE_KEY
+          value: "{{CODE_FILE_KEY}}"
+        - name: INPUT_FILE_KEY
+          value: "{{INPUT_FILE_KEY}}"
+        - name: DATABASE_URL
+          valueFrom:
+            configMapKeyRef:
+              name: codebreaker-config
+              key: DATABASE_URL
+        - name: MINIO_ENDPOINT
+          valueFrom:
+            configMapKeyRef:
+              name: codebreaker-config
+              key: MINIO_ENDPOINT
+        - name: MINIO_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: codebreaker-secrets
+              key: MINIO_ACCESS_KEY
+        - name: MINIO_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: codebreaker-secrets
+              key: MINIO_SECRET_KEY
+        - name: TIME_LIMIT_MS
+          value: "{{TIME_LIMIT_MS}}"
+        - name: MEMORY_LIMIT_MB
+          value: "{{MEMORY_LIMIT_MB}}"
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "500m"
+          limits:
+            memory: "2Gi"
+            cpu: "2000m"
+        securityContext:
+          runAsNonRoot: false
+          privileged: false
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: submission-runner-sa
+  namespace: codebreaker
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: submission-runner-role
+  namespace: codebreaker
+rules:
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get", "list"]
+- apiGroups: [""]
+  resources: ["pods/log"]
+  verbs: ["get"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: submission-runner-rolebinding
+  namespace: codebreaker
+subjects:
+- kind: ServiceAccount
+  name: submission-runner-sa
+  namespace: codebreaker
+roleRef:
+  kind: Role
+  name: submission-runner-role
+  apiGroup: rbac.authorization.k8s.io

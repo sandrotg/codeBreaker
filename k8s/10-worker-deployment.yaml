@@ -1,0 +1,123 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: worker
+  namespace: codebreaker
+  labels:
+    app: worker
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: worker
+  template:
+    metadata:
+      labels:
+        app: worker
+    spec:
+      serviceAccountName: worker-sa
+      containers:
+      - name: worker
+        image: your-registry/codebreaker-api:latest
+        command:
+        - node
+        - dist/main.js
+        env:
+        - name: WORKER_MODE
+          value: "true"
+        - name: DATABASE_URL
+          valueFrom:
+            configMapKeyRef:
+              name: codebreaker-config
+              key: DATABASE_URL
+        - name: JWT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: codebreaker-secrets
+              key: JWT_SECRET
+        - name: REDIS_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: codebreaker-config
+              key: REDIS_HOST
+        - name: REDIS_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: codebreaker-config
+              key: REDIS_PORT
+        - name: MINIO_ENDPOINT
+          valueFrom:
+            configMapKeyRef:
+              name: codebreaker-config
+              key: MINIO_ENDPOINT
+        - name: MINIO_PUBLIC_ENDPOINT
+          valueFrom:
+            configMapKeyRef:
+              name: codebreaker-config
+              key: MINIO_PUBLIC_ENDPOINT
+        - name: MINIO_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: codebreaker-secrets
+              key: MINIO_ACCESS_KEY
+        - name: MINIO_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: codebreaker-secrets
+              key: MINIO_SECRET_KEY
+        - name: NODE_ENV
+          valueFrom:
+            configMapKeyRef:
+              name: codebreaker-config
+              key: NODE_ENV
+        volumeMounts:
+        - name: docker-sock
+          mountPath: /var/run/docker.sock
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "1000m"
+          limits:
+            memory: "4Gi"
+            cpu: "4000m"
+      volumes:
+      - name: docker-sock
+        hostPath:
+          path: /var/run/docker.sock
+          type: Socket
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: worker-sa
+  namespace: codebreaker
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: worker-role
+  namespace: codebreaker
+rules:
+- apiGroups: ["batch"]
+  resources: ["jobs"]
+  verbs: ["create", "get", "list", "watch", "delete"]
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: [""]
+  resources: ["pods/log"]
+  verbs: ["get"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: worker-rolebinding
+  namespace: codebreaker
+subjects:
+- kind: ServiceAccount
+  name: worker-sa
+  namespace: codebreaker
+roleRef:
+  kind: Role
+  name: worker-role
+  apiGroup: rbac.authorization.k8s.io
