@@ -14,4 +14,5 @@ export interface CourseRepositoryPort {
     addChallenge(course: Course, challengeId: string): Promise<void>;
     getAllChallenges(course:Course): Promise<Challenge[]>;
     checkUserinCourse(course: Course, userId: string): Promise<boolean>;
+    findAll(): Promise<Course[]>;
 }

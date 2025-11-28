@@ -17,6 +17,7 @@ import { GetAllChallengesCourseUseCase } from "src/application/courses/usecases/
 import { GetAllUsersInCourseUseCase } from "src/application/courses/usecases/get-all-users.usecase";
 import { GetCourseByNrcUseCase } from "src/application/courses/usecases/get-by-nrc-course.usecase";
 import { GetCourseByTitleUseCase } from "src/application/courses/usecases/get-by-title-course.usecase";
+import { ListAllCoursesUseCase } from "src/application/courses/usecases/list-all-courses.usecase";
 
 @Module({
     controllers: [CoursesController],
@@ -75,6 +76,11 @@ import { GetCourseByTitleUseCase } from "src/application/courses/usecases/get-by
         {
             provide: GetCourseByTitleUseCase,
             useFactory: (courseRepo: CourseRepositoryPort) => new GetCourseByTitleUseCase(courseRepo),
+            inject: [COURSE_REPOSITORY]
+        },
+        {
+            provide: ListAllCoursesUseCase,
+            useFactory: (courseRepo: CourseRepositoryPort) => new ListAllCoursesUseCase(courseRepo),
             inject: [COURSE_REPOSITORY]
         }    
     ],

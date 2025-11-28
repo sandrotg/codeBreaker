@@ -8,6 +8,7 @@ import { GetAllChallengesCourseUseCase } from "src/application/courses/usecases/
 import { GetAllUsersInCourseUseCase } from "src/application/courses/usecases/get-all-users.usecase";
 import { GetCourseByNrcUseCase } from "src/application/courses/usecases/get-by-nrc-course.usecase";
 import { GetCourseByTitleUseCase } from "src/application/courses/usecases/get-by-title-course.usecase";
+import { ListAllCoursesUseCase } from "src/application/courses/usecases/list-all-courses.usecase";
 
 @ApiTags('courses')
 @Controller('courses')
@@ -19,7 +20,8 @@ export class CoursesController {
         private readonly getAllChallengesCourseUC: GetAllChallengesCourseUseCase,
         private readonly getAllUsersCourseUC: GetAllUsersInCourseUseCase,
         private readonly getByNrcUC: GetCourseByNrcUseCase,
-        private readonly getByTitleUC: GetCourseByTitleUseCase
+        private readonly getByTitleUC: GetCourseByTitleUseCase,
+        private readonly listAllCoursesUC: ListAllCoursesUseCase,
     ){}
 
     @Post('create')
@@ -86,5 +88,12 @@ export class CoursesController {
     @ApiResponse({ status: 404, description: 'No courses found.' })
     async getCourseByTitle(@Param('title') title: string){
         return await this.getByTitleUC.execute(title);
+    }
+
+    @Get('/')
+    @ApiOperation({ summary: 'List all courses' })
+    @ApiResponse({ status: 200, description: 'Courses retrieved successfully.' })
+    async listAllCourses(){
+        return await this.listAllCoursesUC.execute();
     }
 }

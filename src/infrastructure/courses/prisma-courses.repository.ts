@@ -134,4 +134,15 @@ export class PrismaCoursesRepository implements CourseRepositoryPort {
         });
         return userCourse ? true : false;
     }
+
+    async findAll(): Promise<Course[]> {
+        const courses = await this.prisma.course.findMany();
+        return courses.map(course => new Course(
+            course.courseId,
+            course.title,
+            course.nrc,
+            course.period,
+            course.group
+        ));
+    }
 }

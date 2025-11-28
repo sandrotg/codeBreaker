@@ -187,16 +187,6 @@ export function ChallengeDetailPage() {
             <p>{challenge.description}</p>
           </div>
 
-          <div className="section">
-            <h2>Entrada</h2>
-            <p>{challenge.inputDescription}</p>
-          </div>
-
-          <div className="section">
-            <h2>Salida</h2>
-            <p>{challenge.outputDescription}</p>
-          </div>
-
           {testCases.length > 0 && (
             <div className="section">
               <h2>Ejemplos</h2>

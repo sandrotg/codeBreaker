@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ApiService, type Challenge } from '../services/api.service';
-import { Search, Filter, Eye, Edit, Trash2, Clock, Database } from 'lucide-react';
+import { Search, Filter, Eye, Edit, Trash2, Clock, Database, X, AlertTriangle, Sparkles } from 'lucide-react';
 import './ChallengesListPage.css';
 
 export function ChallengesListPage() {
@@ -11,6 +11,10 @@ export function ChallengesListPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterDifficulty, setFilterDifficulty] = useState<string>('all');
   const [filterState, setFilterState] = useState<string>('all');
+  const [deleteModal, setDeleteModal] = useState<{ isOpen: boolean; challenge: Challenge | null }>({
+    isOpen: false,
+    challenge: null
+  });
 
   useEffect(() => {
     loadChallenges();
@@ -30,15 +34,31 @@ export function ChallengesListPage() {
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm('¿Estás seguro de eliminar este challenge?')) return;
+  const openDeleteModal = (challenge: Challenge) => {
+    setDeleteModal({
+      isOpen: true,
+      challenge
+    });
+  };
+
+  const closeDeleteModal = () => {
+    setDeleteModal({
+      isOpen: false,
+      challenge: null
+    });
+  };
+
+  const handleDelete = async () => {
+    if (!deleteModal.challenge) return;
 
     try {
-      await ApiService.deleteChallenge(id);
-      setChallenges(challenges.filter(c => c.challengeId !== id));
+      await ApiService.deleteChallenge(deleteModal.challenge.challengeId);
+      setChallenges(challenges.filter(c => c.challengeId !== deleteModal.challenge?.challengeId));
+      closeDeleteModal();
     } catch (err) {
       alert('Error al eliminar el challenge');
       console.error(err);
+      closeDeleteModal();
     }
   };
 
@@ -69,6 +89,11 @@ export function ChallengesListPage() {
     }
   };
 
+  // Función para determinar si se puede editar el challenge
+  const canEditChallenge = (challenge: Challenge) => {
+    return challenge.state !== 'Published';
+  };
+
   if (loading) {
     return (
       <div className="challenges-list-page">
@@ -87,11 +112,52 @@ export function ChallengesListPage() {
 
   return (
     <div className="challenges-list-page">
+      {/* Modal de confirmación de eliminación */}
+      {deleteModal.isOpen && deleteModal.challenge && (
+        <div className="modal-overlay">
+          <div className="confirmation-modal">
+            <div className="modal-header">
+              <div className="warning-icon">
+                <AlertTriangle size={24} />
+              </div>
+              <h3>¿Eliminar Challenge?</h3>
+              <button onClick={closeDeleteModal} className="close-button">
+                <X size={20} />
+              </button>
+            </div>
+            
+            <div className="modal-body">
+              <p>
+                Estás a punto de eliminar el challenge: <strong>"{deleteModal.challenge.title}"</strong>
+              </p>
+              <p className="warning-text">
+                Esta acción no se puede deshacer. Todos los test cases y submissions asociados también serán eliminados.
+              </p>
+            </div>
+            
+            <div className="modal-actions">
+              <button onClick={closeDeleteModal} className="btn-cancel">
+                Cancelar
+              </button>
+              <button onClick={handleDelete} className="btn-confirm-delete">
+                Sí, Eliminar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="page-header">
         <h1>Challenges</h1>
-        <Link to="/challenges/create" className="btn-primary">
-          + Nuevo Challenge
-        </Link>
+        <div className="header-actions">
+          <Link to="/ai-generate" className="btn-ai">
+            <Sparkles size={18} />
+            Generar Challenge con IA
+          </Link>
+          <Link to="/challenges/create" className="btn-primary">
+            + Nuevo Challenge
+          </Link>
+        </div>
       </div>
 
       <div className="filters-section">
@@ -176,11 +242,16 @@ export function ChallengesListPage() {
               <Link to={`/challenges/${challenge.challengeId}`} className="btn-icon" title="Ver">
                 <Eye size={18} />
               </Link>
-              <Link to={`/challenges/${challenge.challengeId}/edit`} className="btn-icon" title="Editar">
-                <Edit size={18} />
-              </Link>
+              
+              {/* Solo mostrar botón de editar si el challenge NO está publicado */}
+              {canEditChallenge(challenge) && (
+                <Link to={`/challenges/${challenge.challengeId}/edit`} className="btn-icon" title="Editar">
+                  <Edit size={18} />
+                </Link>
+              )}
+              
               <button 
-                onClick={() => handleDelete(challenge.challengeId)} 
+                onClick={() => openDeleteModal(challenge)} 
                 className="btn-icon btn-danger"
                 title="Eliminar"
               >

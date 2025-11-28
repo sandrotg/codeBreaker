@@ -176,30 +176,6 @@ export function ChallengeEditor({ generatedChallenge, onCancel }: Props) {
           </div>
         </div>
 
-        <div className="form-group">
-          <label htmlFor="inputDescription">Descripción de entrada:</label>
-          <textarea
-            id="inputDescription"
-            name="inputDescription"
-            value={formData.inputDescription}
-            onChange={handleChange}
-            rows={3}
-            required
-          />
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="outputDescription">Descripción de salida:</label>
-          <textarea
-            id="outputDescription"
-            name="outputDescription"
-            value={formData.outputDescription}
-            onChange={handleChange}
-            rows={3}
-            required
-          />
-        </div>
-
         <div className="examples-section">
           <h3>Ejemplos generados:</h3>
           {generatedChallenge.examples.map((example, idx) => (

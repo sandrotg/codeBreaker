@@ -40,4 +40,8 @@ export class PrismaEvaluationRepository implements EvaluationRepository {
             skipDuplicates: true,
         });
     }
+
+    async findAllEvaluations(): Promise<Evaluation[]> {
+        return this.prisma.evaluation.findMany();
+    }
 }

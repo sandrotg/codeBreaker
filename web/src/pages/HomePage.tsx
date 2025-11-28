@@ -1,12 +1,12 @@
 import { Link } from 'react-router-dom';
-import { Sparkles, List, PlusCircle, Zap } from 'lucide-react';
+import { Book, ClipboardList, List, Zap } from 'lucide-react';
 import './HomePage.css';
 
 export function HomePage() {
   return (
     <div className="home-page">
       <section className="hero">
-        <h1> Bienvenido a CodeBreaker</h1>
+        <h1>Bienvenido a CodeBreaker</h1>
         <p className="hero-subtitle">
           Plataforma de challenges de programación con IA
         </p>
@@ -18,13 +18,24 @@ export function HomePage() {
 
       <section className="features">
         <div className="feature-card">
-          <div className="feature-icon ai">
-            <Sparkles size={32} />
+          <div className="feature-icon courses">
+            <Book size={32} />
           </div>
-          <h3>Generación con IA</h3>
-          <p>Crea challenges automáticamente usando GPT y Ollama</p>
-          <Link to="/ai-generate" className="feature-link">
-            Generar Challenge →
+          <h3>Ver Cursos</h3>
+          <p>Explora y gestiona todos los cursos disponibles</p>
+          <Link to="/courses" className="feature-link">
+            Ver Cursos →
+          </Link>
+        </div>
+
+        <div className="feature-card">
+          <div className="feature-icon evaluations">
+            <ClipboardList size={32} />
+          </div>
+          <h3>Ver Evaluaciones</h3>
+          <p>Revisa y administra las evaluaciones del sistema</p>
+          <Link to="/evaluations" className="feature-link">
+            Ver Evaluaciones →
           </Link>
         </div>
 
@@ -36,17 +47,6 @@ export function HomePage() {
           <p>Explora todos los challenges disponibles</p>
           <Link to="/challenges" className="feature-link">
             Ver Lista →
-          </Link>
-        </div>
-
-        <div className="feature-card">
-          <div className="feature-icon create">
-            <PlusCircle size={32} />
-          </div>
-          <h3>Crear Manual</h3>
-          <p>Crea challenges personalizados manualmente</p>
-          <Link to="/challenges/create" className="feature-link">
-            Crear Ahora →
           </Link>
         </div>
 

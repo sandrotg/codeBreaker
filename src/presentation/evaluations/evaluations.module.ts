@@ -11,6 +11,7 @@ import { ChallengeRepository } from "src/domain/challenges/repositories/challeng
 import { DateParser } from "src/domain/shared/date-parser.interface";
 import { dateParser } from "src/infrastructure/date/date-parser";
 import { GetEvaluationUseCase } from "src/application/evaluation/useCases/getEvaluationUseCase";
+import { FindAllEvaluationsUseCase } from "src/application/evaluation/useCases/findAllEvaluations.useCase";
 
 @Module({
     controllers: [EvaluationController],
@@ -45,6 +46,11 @@ import { GetEvaluationUseCase } from "src/application/evaluation/useCases/getEva
             useFactory: (evaluationRepo: EvaluationRepository) => new GetEvaluationUseCase(evaluationRepo),
             inject: [EVALUATION_REPOSITORY],
         },
+        {
+            provide: FindAllEvaluationsUseCase,
+            useFactory: (evaluationRepo: EvaluationRepository) => new FindAllEvaluationsUseCase(evaluationRepo),
+            inject: [EVALUATION_REPOSITORY],
+        }
     ],
 })
 export class EvaluationModule { }

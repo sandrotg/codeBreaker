@@ -35,8 +35,18 @@ export class ChallengeController {
     @ApiOperation({ summary: "Delete Challenge" })
     @ApiOkResponse({ description: "The challenge was deleted correctly" })
     async delete(@Param('id') id: string) {
+        const testCases = await this.listTestCasesByChallenge.execute(id);
+        for (const tc of testCases) {
+            const response = await fetch(`http://localhost:3000/testcase/delete/${tc.testCaseId}`, {
+                method: 'DELETE',
+            });
+            if (!response.ok) {
+                throw new Error(`Failed to delete test case: ${tc.testCaseId}`);
+            }
+        }
         return await this.deleteChallenge.execute(id);
     }
+
 
     @Get("/find/:id")
     @ApiOperation({ summary: "Find Challenge" })
