@@ -4,6 +4,7 @@ import { Course } from "src/domain/courses/entities/course.entity";
 import { User } from "src/domain/users/entities/user.entity";
 import { UserCourse } from "src/domain/courses/entities/user-course.entity";
 import { Challenge, Difficulty, State } from "src/domain/challenges/entities/challenges.entity";
+import { Evaluation } from "src/domain/evaluations/entities/evaluation.entity";
 
 export class PrismaCoursesRepository implements CourseRepositoryPort {
     constructor(private readonly prisma: PrismaService) { }
@@ -122,6 +123,30 @@ export class PrismaCoursesRepository implements CourseRepositoryPort {
             c.challenge.memoryLimit,
             c.challenge.description,
             c.challenge.state as State
+        ));
+    }
+
+    async addEvaluation(course: Course, evaluationId: string): Promise<void> {
+        await this.prisma.evaluationCourse.create({
+            data:{
+                courseId: course.courseId,
+                evaluationId: evaluationId,
+            }
+        })
+    }
+
+    async getAllEvaluations(course: Course): Promise<Evaluation[]>{
+        const evaluations = await this.prisma.evaluationCourse.findMany({
+            where: { courseId: course.courseId},
+            include: {
+                evaluation: true,
+            }
+        });
+        return evaluations.map(e => new Evaluation(
+            e.evaluation.evaluationId,
+            e.evaluation.name,
+            e.evaluation.startAt,
+            e.evaluation.duration
         ));
     }
 

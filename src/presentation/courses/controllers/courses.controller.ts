@@ -2,9 +2,11 @@ import { Body, Controller, Get, Param, ParseIntPipe, Post } from "@nestjs/common
 import { ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { createCourseDto } from "src/application/courses/dto/create-course.dto";
 import { AddChanllengeToCourseUseCase } from "src/application/courses/usecases/add-challenge-course.usecase";
+import { AddEvaluationToCourseUseCase } from "src/application/courses/usecases/add-evaluation-course.usecase";
 import { AddUserToCourseUseCase } from "src/application/courses/usecases/add-users-course.usecase";
 import { createCourseUsecase } from "src/application/courses/usecases/create-course.usecase";
 import { GetAllChallengesCourseUseCase } from "src/application/courses/usecases/get-all-challenges.usecase";
+import { GetAllEvaluationsCourseUseCase } from "src/application/courses/usecases/get-all-evaluations.usecase";
 import { GetAllUsersInCourseUseCase } from "src/application/courses/usecases/get-all-users.usecase";
 import { GetCourseByNrcUseCase } from "src/application/courses/usecases/get-by-nrc-course.usecase";
 import { GetCourseByTitleUseCase } from "src/application/courses/usecases/get-by-title-course.usecase";
@@ -17,8 +19,10 @@ export class CoursesController {
         private readonly createCourseUC: createCourseUsecase,
         private readonly addUsersCourseUC: AddUserToCourseUseCase,
         private readonly addChallengesCourseUC: AddChanllengeToCourseUseCase,
+        private readonly addEvaluationsCourseUC: AddEvaluationToCourseUseCase,
         private readonly getAllChallengesCourseUC: GetAllChallengesCourseUseCase,
         private readonly getAllUsersCourseUC: GetAllUsersInCourseUseCase,
+        private readonly getAllEvaluationCourseUC: GetAllEvaluationsCourseUseCase,
         private readonly getByNrcUC: GetCourseByNrcUseCase,
         private readonly getByTitleUC: GetCourseByTitleUseCase,
         private readonly listAllCoursesUC: ListAllCoursesUseCase,
@@ -61,6 +65,25 @@ export class CoursesController {
     @ApiResponse({ status: 404, description: 'Course not found.' })
     async getAllChalengesInCourse(@Param('nrc',ParseIntPipe) nrc: number){
         return await this.getAllChallengesCourseUC.execute(nrc);
+    }
+
+    @Post('add-evaluations/:nrc/:evaluationId')
+    @ApiOperation({ summary: 'Add an evaluation to  a Course' })
+    @ApiParam({ name: 'nrc', description: 'Course NRC', type: 'number' })
+    @ApiParam({ name: 'evaluationId', description: 'Evaluation identifier' })
+    @ApiResponse({ status: 200, description: 'Evaluation added successfully.' })
+    @ApiResponse({ status: 404, description: 'Course or evaluation not found.' })
+    async addEvaluationToCourse(@Param('nrc', ParseIntPipe) nrc: number, @Param('evaluationId') evaluationId: string){
+        return await this.addEvaluationsCourseUC.execute(nrc, evaluationId);
+    }
+
+    @Get('evaluations/:nrc')
+    @ApiOperation({ summary: 'Get all evaluations in a course' })
+    @ApiParam({ name: 'nrc', description: 'Course NRC', type: 'number' })
+    @ApiResponse({ status: 200, description: 'List of evaluations retrieved successfully.' })
+    @ApiResponse({ status: 404, description: 'Course not found.' })
+    async getAllEvaluationsInCourse(@Param('nrc',ParseIntPipe) nrc: number){
+        return await this.getAllEvaluationCourseUC.execute(nrc);
     }
 
     @Get('users/:nrc')

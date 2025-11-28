@@ -6,6 +6,7 @@ import { DeleteEvaluationUseCase } from 'src/application/evaluation/useCases/del
 import { EvaluationResponseDto } from 'src/application/evaluation/dto/getEvaluation.dto';
 import { GetEvaluationUseCase } from 'src/application/evaluation/useCases/getEvaluationUseCase';
 import { FindAllEvaluationsUseCase } from 'src/application/evaluation/useCases/findAllEvaluations.useCase';
+import { GetAllChallengesInEvaluationUseCase } from 'src/application/evaluation/useCases/get-all-challenges.usecase';
 
 @ApiTags("Evaluation")
 @Controller("evaluation")
@@ -15,6 +16,7 @@ export class EvaluationController {
         private readonly deleteEvaluation: DeleteEvaluationUseCase,
         private readonly GetEvaluationUseCase: GetEvaluationUseCase,
         private readonly FindAllEvaluationsUseCase: FindAllEvaluationsUseCase,
+        private readonly getChallengesInEvaluationUseCase: GetAllChallengesInEvaluationUseCase
     ) { }
 
     @Post('/create')
@@ -43,6 +45,13 @@ export class EvaluationController {
     @ApiOkResponse({ type: [EvaluationResponseDto] })
     async findAllEvaluations() {
         return this.FindAllEvaluationsUseCase.execute();
+    }
+    
+    @Get('/challenges/:id')
+    @ApiOperation({ summary: "Get challenges in evaluation by ID" })
+    @ApiOkResponse({ description: "List of challenges retrieved successfully." })
+    async getChallengesInEvaluation(@Param('id') id: string) {
+        return this.getChallengesInEvaluationUseCase.execute(id);
     }
 
 }

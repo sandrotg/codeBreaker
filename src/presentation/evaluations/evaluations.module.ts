@@ -12,6 +12,7 @@ import { DateParser } from "src/domain/shared/date-parser.interface";
 import { dateParser } from "src/infrastructure/date/date-parser";
 import { GetEvaluationUseCase } from "src/application/evaluation/useCases/getEvaluationUseCase";
 import { FindAllEvaluationsUseCase } from "src/application/evaluation/useCases/findAllEvaluations.useCase";
+import { GetAllChallengesInEvaluationUseCase } from "src/application/evaluation/useCases/get-all-challenges.usecase";
 
 @Module({
     controllers: [EvaluationController],
@@ -49,6 +50,10 @@ import { FindAllEvaluationsUseCase } from "src/application/evaluation/useCases/f
         {
             provide: FindAllEvaluationsUseCase,
             useFactory: (evaluationRepo: EvaluationRepository) => new FindAllEvaluationsUseCase(evaluationRepo),
+        },
+        {
+            provide: GetAllChallengesInEvaluationUseCase,
+            useFactory: (evaluationRepo: EvaluationRepository) => new GetAllChallengesInEvaluationUseCase(evaluationRepo),
             inject: [EVALUATION_REPOSITORY],
         }
     ],

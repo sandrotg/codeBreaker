@@ -1,7 +1,7 @@
 import { Module } from "@nestjs/common";
 import { CoursesController } from "../controllers/courses.controller";
 import { PrismaService } from "src/infrastructure/prisma.service";
-import { CHALLENGE_REPOSITORY, COURSE_REPOSITORY, ROLE_REPOSITORY, USER_REPOSITORY } from "src/application/tokens";
+import { CHALLENGE_REPOSITORY, COURSE_REPOSITORY, EVALUATION_REPOSITORY, ROLE_REPOSITORY, USER_REPOSITORY } from "src/application/tokens";
 import { PrismaCoursesRepository } from "src/infrastructure/courses/prisma-courses.repository";
 import { PrismaUserRepository } from "src/infrastructure/users/database/prisma-user.repository";
 import { PrismaRoleRepository } from "src/infrastructure/users/database/prisma-role.repository";
@@ -18,6 +18,12 @@ import { GetAllUsersInCourseUseCase } from "src/application/courses/usecases/get
 import { GetCourseByNrcUseCase } from "src/application/courses/usecases/get-by-nrc-course.usecase";
 import { GetCourseByTitleUseCase } from "src/application/courses/usecases/get-by-title-course.usecase";
 import { ListAllCoursesUseCase } from "src/application/courses/usecases/list-all-courses.usecase";
+import { AddEvaluationToCourseUseCase } from "src/application/courses/usecases/add-evaluation-course.usecase";
+import { EvaluationRepository } from "src/domain/evaluations/repositories/evaluation.repository";
+import { AddEvaluationToCourseUseCase } from "src/application/courses/usecases/add-evaluation-course.usecase";
+import { EvaluationRepository } from "src/domain/evaluations/repositories/evaluation.repository";
+import { PrismaEvaluationRepository } from "src/infrastructure/evaluation/prisma-evaluation.repository";
+import { GetAllEvaluationsCourseUseCase } from "src/application/courses/usecases/get-all-evaluations.usecase";
 
 @Module({
     controllers: [CoursesController],
@@ -35,17 +41,22 @@ import { ListAllCoursesUseCase } from "src/application/courses/usecases/list-all
         },
         {
             provide: ROLE_REPOSITORY,
-            useFactory: (prisma:PrismaService)=> new PrismaRoleRepository(prisma),
+            useFactory: (prisma: PrismaService) => new PrismaRoleRepository(prisma),
             inject: [PrismaService]
         },
         {
             provide: CHALLENGE_REPOSITORY,
-            useFactory: (prisma: PrismaService)=> new PrismaChallengeRepository(prisma),
+            useFactory: (prisma: PrismaService) => new PrismaChallengeRepository(prisma),
+            inject: [PrismaService]
+        },
+        {
+            provide: EVALUATION_REPOSITORY,
+            useFactory: (prisma: PrismaService) => new PrismaEvaluationRepository(prisma),
             inject: [PrismaService]
         },
         {
             provide: createCourseUsecase,
-            useFactory: (courseRepo:CourseRepositoryPort, userRepo: UserRepository) => new createCourseUsecase(courseRepo, userRepo),
+            useFactory: (courseRepo: CourseRepositoryPort, userRepo: UserRepository) => new createCourseUsecase(courseRepo, userRepo),
             inject: [COURSE_REPOSITORY, USER_REPOSITORY]
         },
         {
@@ -59,6 +70,11 @@ import { ListAllCoursesUseCase } from "src/application/courses/usecases/list-all
             inject: [COURSE_REPOSITORY, USER_REPOSITORY, ROLE_REPOSITORY]
         },
         {
+            provide: AddEvaluationToCourseUseCase,
+            useFactory: (courseRepo: CourseRepositoryPort, evalRepo: EvaluationRepository) => new AddEvaluationToCourseUseCase(courseRepo, evalRepo),
+            inject: [COURSE_REPOSITORY, EVALUATION_REPOSITORY]
+        },
+        {
             provide: GetAllChallengesCourseUseCase,
             useFactory: (courseRepo: CourseRepositoryPort) => new GetAllChallengesCourseUseCase(courseRepo),
             inject: [COURSE_REPOSITORY]
@@ -69,8 +85,13 @@ import { ListAllCoursesUseCase } from "src/application/courses/usecases/list-all
             inject: [COURSE_REPOSITORY]
         },
         {
+            provide: GetAllEvaluationsCourseUseCase,
+            useFactory: (courseRepo: CourseRepositoryPort) => new GetAllEvaluationsCourseUseCase(courseRepo),
+            inject: [COURSE_REPOSITORY]
+        },
+        {
             provide: GetCourseByNrcUseCase,
-            useFactory: (courseRepo: CourseRepositoryPort)=> new GetCourseByNrcUseCase(courseRepo),
+            useFactory: (courseRepo: CourseRepositoryPort) => new GetCourseByNrcUseCase(courseRepo),
             inject: [COURSE_REPOSITORY]
         },
         {
