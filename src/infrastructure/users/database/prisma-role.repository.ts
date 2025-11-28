@@ -10,6 +10,17 @@ export class PrismaRoleRepository implements RoleRepository {
         private readonly prisma: PrismaService
     ){}
 
+
+async findRoleByName(name: roleName): Promise<Role | null> {
+  const role = await this.prisma.role.findFirst({
+    where: { name },
+  });
+
+  return role ? new Role(role.roleId, role.name as roleName) : null;
+}
+
+
+
     async save(role: Role): Promise<Role> {
             const saved = await this.prisma.role.create({
                 data:{

@@ -8,6 +8,17 @@ export class PrismaUserRepository implements UserRepository{
     constructor(
         private readonly prisma:PrismaService
     ){}
+    async findAllStudents(name?: string): Promise<User[]> {
+        const users = await this.prisma.user.findMany({where:{role:{is:{name:"Student"}}}});
+        return users.map(user => new User(
+            user.userId,
+            user.userName,
+            user.passwordHash,
+            user.roleId,
+            user.email,
+            user.createdAt
+        ));
+    }
 
     async save(user:User): Promise<User>{
         const saved = await this.prisma.user.create({
@@ -61,5 +72,7 @@ export class PrismaUserRepository implements UserRepository{
             updatedUser.createdAt
         )
     }
+
+    
     
 }

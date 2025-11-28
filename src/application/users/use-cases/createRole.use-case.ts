@@ -14,14 +14,17 @@ export class CreateRoleUseCase{
 
 
     async execute(roleInput: CreateRoleDto ): Promise<Role>{
+        
+        const existingRole = await this.roleRepo.findRoleByName(roleInput.name)
+
+        if(existingRole){
+            throw new Error("Role already exists")
+        }
+        
         const role = new Role(
             randomUUID(),
             roleInput.name,   
         );
-
-        
-
-        console.log(roleInput.name)
 
         return this.roleRepo.save(role);
     }
