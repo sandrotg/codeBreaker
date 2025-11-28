@@ -16,8 +16,7 @@ import { JwtAuthGuard } from 'src/presentation/shared/guards/jwt-auth.guard';
 import { RolesGuard } from 'src/presentation/shared/guards/roles.guard';
 import { Roles } from 'src/presentation/shared/decorators/roles.decorator';
 import { roleName } from 'src/domain/users/entities/role.entity';
-import { GetAllStudentsUseCase } from 'src/application/users/use-cases/get-Students.use-case';
-
+import { GetCoursesByStudentUseCase } from 'src/application/users/use-cases/get-Students.use-case';
 @Controller("users")
 export class UsersController {
   constructor(
@@ -26,8 +25,14 @@ export class UsersController {
     private readonly getUser: GetUserUseCase,
     private readonly createUser: CreateUserUseCase,
     private readonly refreshtoken: RefreshTokenUseCase,
-    private readonly getallstudents: GetAllStudentsUseCase
+    private readonly getCoursesBy: GetCoursesByStudentUseCase
   ) {}
+
+
+  @Get(":id/cursosdeunusuario")
+  async cursosdeunusuario(@Param('id')userId:string){
+    return this.getCoursesBy.execute(userId)
+  }
 
   // 🟢 PÚBLICO
   @Post("login")
@@ -81,19 +86,6 @@ export class UsersController {
   async GetUserByEmail(@Param("email") email: string) {
     return this.getUser.execute({ email, criteria: 'email' });
   }
-
-  @UseGuards(JwtAuthGuard,RolesGuard)
-  @Roles(roleName.STUDENT)
-  @ApiBearerAuth()
-  @Get('/students/')
-  async GetAllstudents(@Query('name') name?:string){
-    const students = await this.getallstudents.execute(name);
-    return{
-      message: 'Students retrieved sucessfully',
-      data: students
-    }
-  }
-
 
 }
 

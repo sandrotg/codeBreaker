@@ -2,23 +2,33 @@ import { Injectable } from "@nestjs/common";
 import type { UserRepository } from "src/domain/users/repositories/user.repository.port";
 import { User } from "src/domain/users/entities/user.entity";
 import { PrismaService } from "src/infrastructure/prisma.service";
+import { Course } from "src/domain/courses/entities/course.entity";
 
 @Injectable()
 export class PrismaUserRepository implements UserRepository{
     constructor(
         private readonly prisma:PrismaService
     ){}
-    async findAllStudents(name?: string): Promise<User[]> {
-        const users = await this.prisma.user.findMany({where:{role:{is:{name:"Student"}}}});
-        return users.map(user => new User(
-            user.userId,
-            user.userName,
-            user.passwordHash,
-            user.roleId,
-            user.email,
-            user.createdAt
-        ));
+async findCoursesByStudent(userId: string): Promise<Course[]> {
+  const userWithCourses = await this.prisma.userCourse.findMany({
+    where: { userId },
+    include: {
+      course:true
     }
+  });
+  
+  if (!userWithCourses) throw new Error("not user found");
+  
+  // userWithCourses.courses is UserCourse[]
+  // each item has: { id, userId, courseId, score, course }
+  return userWithCourses.map(uc => new Course(
+     uc.course.courseId,
+     uc.course.title,
+     uc.course.nrc,
+     uc.course.period,
+     uc.course.group
+  ));
+}
 
     async save(user:User): Promise<User>{
         const saved = await this.prisma.user.create({

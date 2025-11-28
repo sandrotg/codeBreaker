@@ -21,7 +21,7 @@ import { JwtStrategy } from "src/presentation/shared/strategies/jwt.strategy";
 
 import { PassportModule } from "@nestjs/passport";
 import { PrismaRoleRepository } from "src/infrastructure/users/database/prisma-role.repository";
-import { GetAllStudentsUseCase } from "src/application/users/use-cases/get-Students.use-case";
+import { GetCoursesByStudentUseCase } from "src/application/users/use-cases/get-Students.use-case";
 
 @Module({
   imports: [
@@ -60,8 +60,8 @@ import { GetAllStudentsUseCase } from "src/application/users/use-cases/get-Stude
 
     },
         {
-      provide: GetAllStudentsUseCase,
-      useFactory: (repo:UserRepository) => new GetAllStudentsUseCase(repo),
+      provide: GetCoursesByStudentUseCase,
+      useFactory: (repo:UserRepository) => new GetCoursesByStudentUseCase(repo),
       inject: [USER_REPOSITORY],
 
     },

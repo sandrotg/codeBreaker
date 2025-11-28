@@ -1,21 +1,30 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { User } from 'src/domain/users/entities/user.entity';
 import type { UserRepository } from 'src/domain/users/repositories/user.repository.port';
 import { USER_REPOSITORY } from 'src/application/tokens';
+import { Course } from 'src/domain/courses/entities/course.entity';
 
 @Injectable()
-export class GetAllStudentsUseCase {
+export class GetCoursesByStudentUseCase {
   constructor(
     @Inject(USER_REPOSITORY) private readonly userRepo: UserRepository,
   ) {}
 
-  async execute(name?: string): Promise<User[]> {
-    const students = await this.userRepo.findAllStudents(name);
+  async execute(userId: string): Promise<Course[]> {
+    
+    const user = await this.userRepo.findUserById(userId);
 
-    if (!students || students.length === 0) {
-      throw new Error('students not found');
+    if(!user){
+      throw new Error("User not found")
+    }
+    
+    const courses = await this.userRepo.findCoursesByStudent(userId);
+
+    if (!courses || courses.length === 0) {
+      throw new Error('No courses found for this student');
     }
 
-    return students;
+    return courses;
   }
 }
+
+
