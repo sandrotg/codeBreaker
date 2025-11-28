@@ -60,8 +60,6 @@ services:
       MINIO_PUBLIC_ENDPOINT: "http://localhost:9000"
       MINIO_ACCESS_KEY: "minioadmin"
       MINIO_SECRET_KEY: "minioadmin123"
-      OLLAMA_API_KEY: "1b9e9c0f4fa47ab95fb31384c842a03.4wdk8ln6tvpE4Fqi8MDaF24td"
-      OPENAI_API_KEY: "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"
       NODE_ENV: "production"
     command: >
       sh -c "
