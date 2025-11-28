@@ -20,8 +20,6 @@ import { GetCourseByTitleUseCase } from "src/application/courses/usecases/get-by
 import { ListAllCoursesUseCase } from "src/application/courses/usecases/list-all-courses.usecase";
 import { AddEvaluationToCourseUseCase } from "src/application/courses/usecases/add-evaluation-course.usecase";
 import { EvaluationRepository } from "src/domain/evaluations/repositories/evaluation.repository";
-import { AddEvaluationToCourseUseCase } from "src/application/courses/usecases/add-evaluation-course.usecase";
-import { EvaluationRepository } from "src/domain/evaluations/repositories/evaluation.repository";
 import { PrismaEvaluationRepository } from "src/infrastructure/evaluation/prisma-evaluation.repository";
 import { GetAllEvaluationsCourseUseCase } from "src/application/courses/usecases/get-all-evaluations.usecase";
 
