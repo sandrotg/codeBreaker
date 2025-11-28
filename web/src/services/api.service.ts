@@ -55,6 +55,23 @@ export interface User {
   createdAt: Date;
 }
 
+export interface Evaluation {
+  evaluationId: string;
+  name: string;
+  startAt: Date;
+  duration: number;
+  createdAt: Date;
+}
+
+export interface EvaluationDetails {
+  evaluationId: string;
+  name: string;
+  startAt: string;
+  durationMinutes: number;
+  state: string;
+  expiresAt: string;
+}
+
 export class ApiService {
   // ============ AI Challenges ============
   static async generateChallenge(theme: string): Promise<ChallengeResponse> {
@@ -192,7 +209,7 @@ export class ApiService {
     return response.json();
   }
 
-  // Cursos
+  // ============ Courses ============
   static async createCourse(courseData: {
     creatorEmail: string;
     title: string;
@@ -262,14 +279,14 @@ export class ApiService {
     return response.json();
   }
 
-  //////////////////////////////////////////////////////////EVALUATIONS//////////////////////////////////////////////////////////
+  // ============ Evaluations ============
 
   static async createEvaluation(evaluationData: {
     name: string;
     startAt: string;
     duration: number;
     challengeIds: string[];
-  }): Promise<any> {
+  }): Promise<Evaluation> {
     const response = await fetch(`${API_URL}/evaluation/create`, {
       method: 'POST',
       headers: {
@@ -281,10 +298,22 @@ export class ApiService {
     return response.json();
   }
 
-  // En tu ApiService
-  static async getEvaluations(): Promise<any[]> {
-    const response = await fetch(`${API_URL}/evaluations`);
+  static async getEvaluations(): Promise<Evaluation[]> {
+    const response = await fetch(`${API_URL}/evaluation`);
     if (!response.ok) throw new Error('Error al obtener evaluaciones');
     return response.json();
+  }
+
+  static async getEvaluationById(id: string): Promise<EvaluationDetails> {
+    const response = await fetch(`${API_URL}/evaluation/${id}`);
+    if (!response.ok) throw new Error('Error al obtener evaluación');
+    return response.json();
+  }
+
+  static async deleteEvaluation(id: string): Promise<void> {
+    const response = await fetch(`${API_URL}/evaluation/delete/${id}`, {
+      method: 'DELETE',
+    });
+    if (!response.ok) throw new Error('Error al eliminar evaluación');
   }
 }

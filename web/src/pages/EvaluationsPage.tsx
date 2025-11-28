@@ -112,13 +112,11 @@ export function CreateEvaluationPage() {
         challengeIds: formData.challengeIds
       };
 
-      // await ApiService.createEvaluation(evaluationData);
-      console.log('Creando evaluación:', evaluationData);
+      // Llamada REAL al endpoint
+      await ApiService.createEvaluation(evaluationData);
       
-      // Simulación de éxito
-      setTimeout(() => {
-        navigate('/evaluations');
-      }, 1000);
+      // Redirigir a la lista de evaluaciones
+      navigate('/evaluations');
 
     } catch (err) {
       setError('Error al crear la evaluación');
