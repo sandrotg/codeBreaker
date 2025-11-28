@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Home, List, PlusCircle, Sparkles, FileText, LogIn, LogOut, User } from 'lucide-react';
+import { Home, List, Sparkles, LogIn, LogOut, User } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import './Navbar.css';
 

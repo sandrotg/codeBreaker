@@ -50,6 +50,7 @@ import { GetAllChallengesInEvaluationUseCase } from "src/application/evaluation/
         {
             provide: FindAllEvaluationsUseCase,
             useFactory: (evaluationRepo: EvaluationRepository) => new FindAllEvaluationsUseCase(evaluationRepo),
+            inject: [EVALUATION_REPOSITORY],
         },
         {
             provide: GetAllChallengesInEvaluationUseCase,

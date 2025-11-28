@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ApiService } from '../services/api.service';
-import { Plus, Calendar, Clock, Eye, Trash2 } from 'lucide-react';
+import { Plus, Calendar, Clock, Eye, Trash2, X, AlertTriangle } from 'lucide-react';
 import './ListEvalPage.css';
 
 interface Evaluation {
@@ -17,6 +17,10 @@ export function EvaluationsListPage() {
   const [evaluationStates, setEvaluationStates] = useState<{[key: string]: string}>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [deleteModal, setDeleteModal] = useState<{ isOpen: boolean; evaluation: Evaluation | null }>({
+    isOpen: false,
+    evaluation: null
+  });
 
   useEffect(() => {
     loadEvaluations();
@@ -50,15 +54,31 @@ export function EvaluationsListPage() {
     }
   };
 
-  const handleDelete = async (evaluationId: string) => {
-    if (!confirm('¿Estás seguro de eliminar esta evaluación?')) return;
+  const openDeleteModal = (evaluation: Evaluation) => {
+    setDeleteModal({
+      isOpen: true,
+      evaluation
+    });
+  };
+
+  const closeDeleteModal = () => {
+    setDeleteModal({
+      isOpen: false,
+      evaluation: null
+    });
+  };
+
+  const handleDelete = async () => {
+    if (!deleteModal.evaluation) return;
 
     try {
-      await ApiService.deleteEvaluation(evaluationId);
-      setEvaluations(evaluations.filter(e => e.evaluationId !== evaluationId));
+      await ApiService.deleteEvaluation(deleteModal.evaluation.evaluationId);
+      setEvaluations(evaluations.filter(e => e.evaluationId !== deleteModal.evaluation?.evaluationId));
+      closeDeleteModal();
     } catch (err) {
       alert('Error al eliminar la evaluación');
       console.error(err);
+      closeDeleteModal();
     }
   };
 
@@ -121,6 +141,41 @@ export function EvaluationsListPage() {
 
   return (
     <div className="evaluations-list-page">
+      {/* Modal de confirmación de eliminación */}
+      {deleteModal.isOpen && deleteModal.evaluation && (
+        <div className="modal-overlay">
+          <div className="confirmation-modal">
+            <div className="modal-header">
+              <div className="warning-icon">
+                <AlertTriangle size={24} />
+              </div>
+              <h3>¿Eliminar Evaluación?</h3>
+              <button onClick={closeDeleteModal} className="close-button">
+                <X size={20} />
+              </button>
+            </div>
+            
+            <div className="modal-body">
+              <p>
+                Estás a punto de eliminar la evaluación: <strong>"{deleteModal.evaluation.name}"</strong>
+              </p>
+              <p className="warning-text">
+                Esta acción no se puede deshacer. Todos los datos asociados a esta evaluación se perderán permanentemente.
+              </p>
+            </div>
+            
+            <div className="modal-actions">
+              <button onClick={closeDeleteModal} className="btn-cancel">
+                Cancelar
+              </button>
+              <button onClick={handleDelete} className="btn-confirm-delete">
+                Sí, Eliminar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="page-header">
         <h1>Evaluaciones</h1>
         <Link to="/evaluations/create" className="btn-primary">
@@ -147,7 +202,7 @@ export function EvaluationsListPage() {
                   <Eye size={18} />
                 </Link>
                 <button 
-                  onClick={() => handleDelete(evaluation.evaluationId)}
+                  onClick={() => openDeleteModal(evaluation)}
                   className="btn-icon btn-danger"
                   title="Eliminar"
                 >
@@ -168,7 +223,6 @@ export function EvaluationsListPage() {
             </div>
 
             <div className="evaluation-footer">
-              <span className="evaluation-id">ID: {evaluation.evaluationId.substring(0, 8)}...</span>
               <div className={`status-badge ${getStatusBadge(evaluationStates[evaluation.evaluationId] || 'no_activo')}`}>
                 {getStatusText(evaluationStates[evaluation.evaluationId] || 'no_activo')}
               </div>
