@@ -1,7 +1,6 @@
 import { SubmissionRepositoryPort } from "src/domain/submissions/repositories/submission.repository.port";
 import { PrismaService } from "../prisma.service";
 import { Submission } from "src/domain/submissions/entities/submission.entity";
-import { $Enums } from "@prisma/client";
 import { mapLanguageFromPrisma, mapLanguageToPrisma, mapStatusFromPrisma, mapStatusToPrisma } from "../mappers/submissions.mapper";
 import { map } from "rxjs";
 import { CasesResult } from "src/domain/submissions/entities/casesResult.entity";
