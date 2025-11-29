@@ -21,7 +21,7 @@ import { JwtStrategy } from "src/presentation/shared/strategies/jwt.strategy";
 
 import { PassportModule } from "@nestjs/passport";
 import { PrismaRoleRepository } from "src/infrastructure/users/database/prisma-role.repository";
-import { GetCoursesByStudentUseCase } from "src/application/users/use-cases/get-Students.use-case";
+import { GetCoursesByStudentUseCase } from "src/application/users/use-cases/get-CoursesByStudent.use-case";
 
 @Module({
   imports: [

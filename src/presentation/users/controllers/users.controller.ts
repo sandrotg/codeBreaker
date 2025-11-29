@@ -16,7 +16,7 @@ import { JwtAuthGuard } from 'src/presentation/shared/guards/jwt-auth.guard';
 import { RolesGuard } from 'src/presentation/shared/guards/roles.guard';
 import { Roles } from 'src/presentation/shared/decorators/roles.decorator';
 import { roleName } from 'src/domain/users/entities/role.entity';
-import { GetCoursesByStudentUseCase } from 'src/application/users/use-cases/get-Students.use-case';
+import { GetCoursesByStudentUseCase } from 'src/application/users/use-cases/get-CoursesByStudent.use-case';
 @Controller("users")
 export class UsersController {
   constructor(
