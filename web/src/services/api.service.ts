@@ -1,8 +1,8 @@
-import type { 
-  ChallengeResponse, 
-  CreateChallengeDto, 
+import type {
+  ChallengeResponse,
+  CreateChallengeDto,
   Difficulty,
-  ChallengeState 
+  ChallengeState
 } from '../types/challenge.types';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
@@ -10,13 +10,11 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 export interface Challenge {
   challengeId: string;
   title: string;
-  description: string;
   difficulty: Difficulty;
   tags: string[];
   timeLimit: number;
   memoryLimit: number;
-  inputDescription: string;
-  outputDescription: string;
+  description: string;
   state: ChallengeState;
 }
 
@@ -36,6 +34,42 @@ export interface Submission {
   createdAt: string;
   score?: number;
   timeMsTotal?: number;
+}
+
+export interface Course {
+  courseId: string;
+  title: string;
+  nrc: number;
+  period: string;
+  group: number;
+  users?: User[];
+  challenges?: Challenge[];
+}
+
+export interface User {
+  userId: string;
+  userName: string;
+  email: string;
+  passwordHash: string;
+  roleId: string;
+  createdAt: Date;
+}
+
+export interface Evaluation {
+  evaluationId: string;
+  name: string;
+  startAt: Date;
+  duration: number;
+  createdAt: Date;
+}
+
+export interface EvaluationDetails {
+  evaluationId: string;
+  name: string;
+  startAt: string;
+  durationMinutes: number;
+  state: string;
+  expiresAt: string;
 }
 
 export class ApiService {
@@ -87,7 +121,7 @@ export class ApiService {
 
   static async updateChallenge(id: string, challenge: Partial<CreateChallengeDto>): Promise<Challenge> {
     const response = await fetch(`${API_URL}/challenge/update/${id}`, {
-      method: 'PATCH',
+      method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
       },
@@ -98,6 +132,16 @@ export class ApiService {
       throw new Error('Error al actualizar el challenge');
     }
 
+    return response.json();
+  }
+
+  static async publishChallenge(id: string): Promise<Challenge> {
+    const response = await fetch(`${API_URL}/challenge/publish/${id}`, {
+      method: 'PATCH',
+    });
+    if (!response.ok) {
+      throw new Error('Error al publicar el challenge');
+    }
     return response.json();
   }
 
@@ -163,5 +207,113 @@ export class ApiService {
     }
 
     return response.json();
+  }
+
+  // ============ Courses ============
+  static async createCourse(courseData: {
+    creatorEmail: string;
+    title: string;
+    nrc: number;
+    period: string;
+    group: number;
+  }): Promise<Course> {
+    const response = await fetch(`${API_URL}/courses/create`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(courseData),
+    });
+    if (!response.ok) throw new Error('Error al crear curso');
+    return response.json();
+  }
+
+  static async addUsersToCourse(nrc: number, usersData: { userEmails: string[] }): Promise<void> {
+    const response = await fetch(`${API_URL}/courses/add-users/${nrc}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(usersData),
+    });
+    if (!response.ok) throw new Error('Error al agregar usuarios al curso');
+  }
+
+  static async addChallengeToCourse(nrc: number, challengeId: string): Promise<void> {
+    const response = await fetch(`${API_URL}/courses/add-challenges/${nrc}/${challengeId}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    if (!response.ok) throw new Error('Error al agregar challenge al curso');
+  }
+
+  static async getCourseChallenges(nrc: number): Promise<Challenge[]> {
+    const response = await fetch(`${API_URL}/courses/challenges/${nrc}`);
+    if (!response.ok) throw new Error('Error al obtener challenges del curso');
+    return response.json();
+  }
+
+  static async getCourseUsers(nrc: number): Promise<User[]> {
+    const response = await fetch(`${API_URL}/courses/users/${nrc}`);
+    if (!response.ok) throw new Error('Error al obtener usuarios del curso');
+    return response.json();
+  }
+
+  static async getCourseByNrc(nrc: number): Promise<Course> {
+    const response = await fetch(`${API_URL}/courses/${nrc}`);
+    if (!response.ok) throw new Error('Error al obtener curso');
+    return response.json();
+  }
+
+  static async getCourseByTitle(title: string): Promise<Course> {
+    const response = await fetch(`${API_URL}/courses/${title}`);
+    if (!response.ok) throw new Error('Error al obtener curso');
+    return response.json();
+  }
+
+  static async getAllCourses(): Promise<Course[]> {
+    const response = await fetch(`${API_URL}/courses`);
+    if (!response.ok) throw new Error('Error al obtener cursos');
+    return response.json();
+  }
+
+  // ============ Evaluations ============
+
+  static async createEvaluation(evaluationData: {
+    name: string;
+    startAt: string;
+    duration: number;
+    challengeIds: string[];
+  }): Promise<Evaluation> {
+    const response = await fetch(`${API_URL}/evaluation/create`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(evaluationData),
+    });
+    if (!response.ok) throw new Error('Error al crear evaluación');
+    return response.json();
+  }
+
+  static async getEvaluations(): Promise<Evaluation[]> {
+    const response = await fetch(`${API_URL}/evaluation`);
+    if (!response.ok) throw new Error('Error al obtener evaluaciones');
+    return response.json();
+  }
+
+  static async getEvaluationById(id: string): Promise<EvaluationDetails> {
+    const response = await fetch(`${API_URL}/evaluation/${id}`);
+    if (!response.ok) throw new Error('Error al obtener evaluación');
+    return response.json();
+  }
+
+  static async deleteEvaluation(id: string): Promise<void> {
+    const response = await fetch(`${API_URL}/evaluation/delete/${id}`, {
+      method: 'DELETE',
+    });
+    if (!response.ok) throw new Error('Error al eliminar evaluación');
   }
 }

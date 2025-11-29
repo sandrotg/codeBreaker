@@ -1,22 +1,22 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import { ApiService } from '../services/api.service';
 import type { CreateChallengeDto, Difficulty, ChallengeState } from '../types/challenge.types';
 import { ArrowLeft, Plus, X } from 'lucide-react';
-import './CreateChallengePage.css';
+import './EditChallengePage.css';
 
 interface TestCaseInput {
+  testCaseId?: string;
   input: string;
   output: string;
 }
 
-export function CreateChallengePage() {
+export function EditChallengePage() {
+  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     title: '',
     description: '',
-    inputDescription: '',
-    outputDescription: '',
     difficulty: 'Medium' as Difficulty,
     tags: '',
     timeLimit: 1000,
@@ -28,8 +28,51 @@ export function CreateChallengePage() {
     { input: '', output: '' },
   ]);
 
+  const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Cargar el challenge existente
+  useEffect(() => {
+    if (id) {
+      loadChallenge();
+    }
+  }, [id]);
+
+  const loadChallenge = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      // Cargar datos del challenge
+      const challenge = await ApiService.getChallengeById(id!);
+      
+      setFormData({
+        title: challenge.title,
+        description: challenge.description,
+        difficulty: challenge.difficulty,
+        tags: challenge.tags.join(', '),
+        timeLimit: challenge.timeLimit,
+        memoryLimit: challenge.memoryLimit,
+        state: challenge.state,
+      });
+
+      // Cargar test cases del challenge
+      const existingTestCases = await ApiService.getTestCasesByChallengeId(id!);
+      if (existingTestCases.length > 0) {
+        setTestCases(existingTestCases.map(tc => ({
+          testCaseId: tc.testCaseId,
+          input: tc.input,
+          output: tc.output,
+        })));
+      }
+    } catch (err) {
+      setError('Error al cargar el challenge. Verifica que el ID sea correcto.');
+      console.error('Error loading challenge:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -73,41 +116,76 @@ export function CreateChallengePage() {
         memoryLimit: Number(formData.memoryLimit),
       };
 
-      // 1. Crear el challenge
-      const createdChallenge = await ApiService.createChallenge(challengeData);
+      // 1. Actualizar el challenge
+      await ApiService.updateChallenge(id!, challengeData);
 
-      // 2. Crear los test cases
+      if (challengeData.state === 'Published') {
+        await ApiService.publishChallenge(id!);
+      } 
+
+      // 2. Obtener test cases existentes para comparar
+      const existingTestCases = await ApiService.getTestCasesByChallengeId(id!);
+      
+      // 3. Eliminar test cases que ya no existen
+      const testCasesToDelete = existingTestCases.filter(existingTc => 
+        !validTestCases.some(newTc => newTc.testCaseId === existingTc.testCaseId)
+      );
+      
       await Promise.all(
-        validTestCases.map(testCase =>
-          ApiService.createTestCase({
-            challengeId: createdChallenge.challengeId,
-            input: testCase.input,
-            output: testCase.output,
-          })
+        testCasesToDelete.map(tc => 
+          ApiService.deleteTestCase(tc.testCaseId)
         )
       );
 
-      // Redirigir a la lista de challenges
-      navigate('/challenges');
+      // 4. Crear o actualizar test cases
+      await Promise.all(
+        validTestCases.map(async (testCase) => {
+          if (testCase.testCaseId) {
+            // Actualizar test case existente
+            // Por simplicidad, eliminamos y creamos uno nuevo
+            await ApiService.deleteTestCase(testCase.testCaseId);
+          }
+          await ApiService.createTestCase({
+            challengeId: id!,
+            input: testCase.input,
+            output: testCase.output,
+          });
+        })
+      );
+
+      // Redirigir a la página del challenge
+      navigate(`/challenges`);
     } catch (err) {
-      setError('Error al crear el challenge');
+      setError('Error al actualizar el challenge');
       console.error(err);
     } finally {
       setSaving(false);
     }
   };
 
+  if (loading) {
+    return (
+      <div className="edit-challenge-page">
+        <div className="loading-container">
+          <div className="loading-spinner"></div>
+          <p>Cargando challenge...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="create-challenge-page">
+    <div className="edit-challenge-page">
       <div className="page-header">
-        <button onClick={() => navigate('/challenges')} className="back-button">
+        <button onClick={() => navigate(`/challenges`)} className="back-button">
           <ArrowLeft size={20} />
-          Volver
+          Volver a Challenges
         </button>
-        <h1>Crear Nuevo Challenge</h1>
+        <h1>Editar Challenge</h1>
+        <p className="page-subtitle">Modifica los datos del challenge existente</p>
       </div>
 
-      <form onSubmit={handleSubmit} className="create-form">
+      <form onSubmit={handleSubmit} className="edit-form">
         <div className="form-section">
           <h2>Información Básica</h2>
 
@@ -237,7 +315,7 @@ export function CreateChallengePage() {
                       title="Eliminar"
                     >
                       <X size={18} />
-                      <span className="btn-text">Eliminar</span>
+                      Eliminar
                     </button>
                   )}
                 </div>
@@ -271,11 +349,11 @@ export function CreateChallengePage() {
         {error && <div className="error-message">{error}</div>}
 
         <div className="form-actions">
-          <button type="button" onClick={() => navigate('/challenges')} className="btn-cancel" disabled={saving}>
+          <button type="button" onClick={() => navigate(`/challenges`)} className="btn-cancel" disabled={saving}>
             Cancelar
           </button>
           <button type="submit" className="btn-submit" disabled={saving}>
-            {saving ? 'Creando...' : 'Crear Challenge'}
+            {saving ? 'Guardando...' : 'Guardar Cambios'}
           </button>
         </div>
       </form>

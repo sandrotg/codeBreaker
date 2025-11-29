@@ -1,3 +1,4 @@
+import { Challenge } from "src/domain/challenges/entities/challenges.entity";
 import { Evaluation } from "../entities/evaluation.entity";
 
 export interface EvaluationRepository {
@@ -5,4 +6,6 @@ export interface EvaluationRepository {
     findEvaluationById(evaluationId: string): Promise<Evaluation | null>
     delete(evaluation: Evaluation): Promise<Evaluation> 
     assignChallenges(evaluationId: string, challengeIds: string[]): Promise<void>;
+    findAllEvaluations(): Promise<Evaluation[]>;
+    getChallengesInEvaluation(evaluationId: string): Promise<Challenge[]>;
 }
