@@ -6,24 +6,41 @@ import './HomePage.css';
 
 export function HomePage() {
   const { canViewCourses, canViewEvaluations, isAdmin, isStudent } = useRole();
-  const { user } = useAuth();
+  const { user, isAuthenticated } = useAuth();
   
   const getHeroContent = () => {
+    if (!isAuthenticated) {
+      return {
+        title: '¡Bienvenido a CodeBreaker!',
+        subtitle: 'Plataforma de Challenges de Programación',
+        description: 'Inicia sesión para acceder a challenges, evaluaciones y cursos. Mejora tus habilidades de programación con nuestra plataforma interactiva.',
+        badge: '👋 Invitado'
+      };
+    }
     if (isAdmin) {
       return {
         title: '¡Bienvenido, Profesor!',
         subtitle: 'Panel de Control - CodeBreaker',
-        description: 'Gestiona cursos, crea evaluaciones y challenges. Utiliza IA para generar retos automáticamente y supervisa el progreso de tus estudiantes.'
+        description: 'Gestiona cursos, crea evaluaciones y challenges. Utiliza IA para generar retos automáticamente y supervisa el progreso de tus estudiantes.',
+        badge: '🎓 Profesor'
       };
     }
     return {
       title: `¡Hola, ${user?.userName || 'Estudiante'}!`,
       subtitle: 'Tu Plataforma de Aprendizaje',
-      description: 'Resuelve challenges de programación, participa en evaluaciones y mejora tus habilidades. ¡Cada reto es una oportunidad para crecer!'
+      description: 'Resuelve challenges de programación, participa en evaluaciones y mejora tus habilidades. ¡Cada reto es una oportunidad para crecer!',
+      badge: '💻 Estudiante'
     };
   };
 
   const getStatsContent = () => {
+    if (!isAuthenticated) {
+      return [
+        { value: '∞', label: 'Challenges' },
+        { value: 'IA', label: 'Con Inteligencia Artificial' },
+        { value: '24/7', label: 'Disponible' }
+      ];
+    }
     if (isAdmin) {
       return [
         { value: '∞', label: 'Challenges con IA' },
@@ -45,7 +62,7 @@ export function HomePage() {
     <div className="home-page">
       <section className="hero">
         <div className="hero-badge">
-          {isAdmin ? '🎓 Profesor' : '💻 Estudiante'}
+          {heroContent.badge}
         </div>
         <h1>{heroContent.title}</h1>
         <p className="hero-subtitle">
@@ -57,7 +74,7 @@ export function HomePage() {
       </section>
 
       <section className="features">
-        {canViewCourses && (
+        {isAuthenticated && canViewCourses && (
           <div className="feature-card">
             <div className="feature-icon courses">
               <Book size={32} />
@@ -70,7 +87,7 @@ export function HomePage() {
           </div>
         )}
 
-        {canViewEvaluations && (
+        {isAuthenticated && canViewEvaluations && (
           <div className="feature-card">
             <div className="feature-icon evaluations">
               <ClipboardList size={32} />
@@ -83,27 +100,66 @@ export function HomePage() {
           </div>
         )}
 
-        <div className="feature-card">
-          <div className="feature-icon challenges">
-            <Code size={32} />
+        {isAuthenticated && (
+          <div className="feature-card">
+            <div className="feature-icon challenges">
+              <Code size={32} />
+            </div>
+            <h3>{isAdmin ? 'Challenges' : 'Resolver Challenges'}</h3>
+            <p>{isAdmin ? 'Crea y edita desafíos con IA' : 'Practica con retos de programación'}</p>
+            <Link to="/challenges" className="feature-link">
+              {isAdmin ? 'Gestionar →' : 'Explorar →'}
+            </Link>
           </div>
-          <h3>{isAdmin ? 'Challenges' : 'Resolver Challenges'}</h3>
-          <p>{isAdmin ? 'Crea y edita desafíos con IA' : 'Practica con retos de programación'}</p>
-          <Link to="/challenges" className="feature-link">
-            {isAdmin ? 'Gestionar →' : 'Explorar →'}
-          </Link>
-        </div>
+        )}
 
-        <div className="feature-card">
-          <div className="feature-icon submissions">
-            <Zap size={32} />
+        {isAuthenticated && (
+          <div className="feature-card">
+            <div className="feature-icon submissions">
+              <Zap size={32} />
+            </div>
+            <h3>{isAdmin ? 'Submissions' : 'Mis Soluciones'}</h3>
+            <p>{isAdmin ? 'Revisa soluciones de estudiantes' : 'Revisa tu historial de envíos'}</p>
+            <Link to="/submissions" className="feature-link">
+              {isAdmin ? 'Ver Todas →' : 'Mi Historial →'}
+            </Link>
           </div>
-          <h3>{isAdmin ? 'Submissions' : 'Mis Soluciones'}</h3>
-          <p>{isAdmin ? 'Revisa soluciones de estudiantes' : 'Revisa tu historial de envíos'}</p>
-          <Link to="/submissions" className="feature-link">
-            {isAdmin ? 'Ver Todas →' : 'Mi Historial →'}
-          </Link>
-        </div>
+        )}
+
+        {!isAuthenticated && (
+          <>
+            <div className="feature-card">
+              <div className="feature-icon challenges">
+                <Code size={32} />
+              </div>
+              <h3>Challenges de Programación</h3>
+              <p>Resuelve problemas algorítmicos y mejora tus habilidades</p>
+              <Link to="/login" className="feature-link">
+                Iniciar Sesión →
+              </Link>
+            </div>
+            <div className="feature-card">
+              <div className="feature-icon evaluations">
+                <ClipboardList size={32} />
+              </div>
+              <h3>Evaluaciones en Tiempo Real</h3>
+              <p>Participa en evaluaciones y obtén retroalimentación instantánea</p>
+              <Link to="/login" className="feature-link">
+                Iniciar Sesión →
+              </Link>
+            </div>
+            <div className="feature-card">
+              <div className="feature-icon courses">
+                <Book size={32} />
+              </div>
+              <h3>Cursos Interactivos</h3>
+              <p>Accede a cursos estructurados con challenges organizados</p>
+              <Link to="/login" className="feature-link">
+                Iniciar Sesión →
+              </Link>
+            </div>
+          </>
+        )}
       </section>
 
       {isStudent && (

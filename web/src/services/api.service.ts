@@ -4,8 +4,23 @@ import type {
   Difficulty,
   ChallengeState
 } from '../types/challenge.types';
+import { cookieUtils } from '../utils/cookies';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+
+// Helper para obtener headers con autenticación
+const getAuthHeaders = (): HeadersInit => {
+  const token = cookieUtils.get('token');
+  const headers: HeadersInit = {
+    'Content-Type': 'application/json',
+  };
+  
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+  
+  return headers;
+};
 
 export interface Challenge {
   challengeId: string;
@@ -78,9 +93,7 @@ export class ApiService {
   static async generateChallenge(theme: string): Promise<ChallengeResponse> {
     const response = await fetch(`${API_URL}/ai-challenges/generate`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: getAuthHeaders(),
       body: JSON.stringify({ theme }),
     });
 
@@ -93,13 +106,17 @@ export class ApiService {
 
   // ============ Challenges CRUD ============
   static async getChallenges(): Promise<Challenge[]> {
-    const response = await fetch(`${API_URL}/challenge/list`);
+    const response = await fetch(`${API_URL}/challenge/list`, {
+      headers: getAuthHeaders(),
+    });
     if (!response.ok) throw new Error('Error al obtener challenges');
     return response.json();
   }
 
   static async getChallengeById(id: string): Promise<Challenge> {
-    const response = await fetch(`${API_URL}/challenge/find/${id}`);
+    const response = await fetch(`${API_URL}/challenge/find/${id}`, {
+      headers: getAuthHeaders(),
+    });
     if (!response.ok) throw new Error('Error al obtener challenge');
     return response.json();
   }
@@ -107,9 +124,7 @@ export class ApiService {
   static async createChallenge(challenge: CreateChallengeDto): Promise<Challenge> {
     const response = await fetch(`${API_URL}/challenge/create`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: getAuthHeaders(),
       body: JSON.stringify(challenge),
     });
 
@@ -123,9 +138,7 @@ export class ApiService {
   static async updateChallenge(id: string, challenge: Partial<CreateChallengeDto>): Promise<Challenge> {
     const response = await fetch(`${API_URL}/challenge/update/${id}`, {
       method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: getAuthHeaders(),
       body: JSON.stringify(challenge),
     });
 
@@ -139,6 +152,7 @@ export class ApiService {
   static async publishChallenge(id: string): Promise<Challenge> {
     const response = await fetch(`${API_URL}/challenge/publish/${id}`, {
       method: 'PATCH',
+      headers: getAuthHeaders(),
     });
     if (!response.ok) {
       throw new Error('Error al publicar el challenge');
@@ -149,6 +163,7 @@ export class ApiService {
   static async deleteChallenge(id: string): Promise<void> {
     const response = await fetch(`${API_URL}/challenge/delete/${id}`, {
       method: 'DELETE',
+      headers: getAuthHeaders(),
     });
 
     if (!response.ok) {
@@ -158,7 +173,9 @@ export class ApiService {
 
   // ============ Test Cases ============
   static async getTestCasesByChallengeId(challengeId: string): Promise<TestCase[]> {
-    const response = await fetch(`${API_URL}/challenge/${challengeId}/testcases`);
+    const response = await fetch(`${API_URL}/challenge/${challengeId}/testcases`, {
+      headers: getAuthHeaders(),
+    });
     if (!response.ok) throw new Error('Error al obtener test cases');
     return response.json();
   }
@@ -166,9 +183,7 @@ export class ApiService {
   static async createTestCase(testCase: Omit<TestCase, 'testCaseId'>): Promise<TestCase> {
     const response = await fetch(`${API_URL}/testcase/create`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: getAuthHeaders(),
       body: JSON.stringify(testCase),
     });
 
@@ -182,6 +197,7 @@ export class ApiService {
   static async deleteTestCase(id: string): Promise<void> {
     const response = await fetch(`${API_URL}/testcase/delete/${id}`, {
       method: 'DELETE',
+      headers: getAuthHeaders(),
     });
 
     if (!response.ok) {
@@ -197,9 +213,7 @@ export class ApiService {
   }): Promise<Submission> {
     const response = await fetch(`${API_URL}/submissions`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: getAuthHeaders(),
       body: JSON.stringify(submission),
     });
 
@@ -220,9 +234,7 @@ export class ApiService {
   }): Promise<Course> {
     const response = await fetch(`${API_URL}/courses/create`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: getAuthHeaders(),
       body: JSON.stringify(courseData),
     });
     if (!response.ok) throw new Error('Error al crear curso');
@@ -232,9 +244,7 @@ export class ApiService {
   static async addUsersToCourse(nrc: number, usersData: { userEmails: string[] }): Promise<void> {
     const response = await fetch(`${API_URL}/courses/add-users/${nrc}`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: getAuthHeaders(),
       body: JSON.stringify(usersData),
     });
     if (!response.ok) throw new Error('Error al agregar usuarios al curso');
@@ -243,51 +253,63 @@ export class ApiService {
   static async addChallengeToCourse(nrc: number, challengeId: string): Promise<void> {
     const response = await fetch(`${API_URL}/courses/add-challenges/${nrc}/${challengeId}`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: getAuthHeaders(),
     });
     if (!response.ok) throw new Error('Error al agregar challenge al curso');
   }
 
   static async getCourseChallenges(nrc: number): Promise<Challenge[]> {
-    const response = await fetch(`${API_URL}/courses/challenges/${nrc}`);
+    const response = await fetch(`${API_URL}/courses/challenges/${nrc}`, {
+      headers: getAuthHeaders(),
+    });
     if (!response.ok) throw new Error('Error al obtener challenges del curso');
     return response.json();
   }
 
   static async getCourseUsers(nrc: number): Promise<User[]> {
-    const response = await fetch(`${API_URL}/courses/users/${nrc}`);
+    const response = await fetch(`${API_URL}/courses/users/${nrc}`, {
+      headers: getAuthHeaders(),
+    });
     if (!response.ok) throw new Error('Error al obtener usuarios del curso');
     return response.json();
   }
 
   static async getCourseByNrc(nrc: number): Promise<Course> {
-    const response = await fetch(`${API_URL}/courses/${nrc}`);
+    const response = await fetch(`${API_URL}/courses/${nrc}`, {
+      headers: getAuthHeaders(),
+    });
     if (!response.ok) throw new Error('Error al obtener curso');
     return response.json();
   }
 
   static async getCourseByTitle(title: string): Promise<Course> {
-    const response = await fetch(`${API_URL}/courses/${title}`);
+    const response = await fetch(`${API_URL}/courses/${title}`, {
+      headers: getAuthHeaders(),
+    });
     if (!response.ok) throw new Error('Error al obtener curso');
     return response.json();
   }
 
   static async getCourseEvaluations(nrc: number): Promise<Evaluation[]> {
-    const response = await fetch(`${API_URL}/courses/evaluations/${nrc}`);
+    const response = await fetch(`${API_URL}/courses/evaluations/${nrc}`, {
+      headers: getAuthHeaders(),
+    });
     if (!response.ok) throw new Error('Error al obtener evaluaciones del curso');
     return response.json();
   }
 
   static async getAllCourses(): Promise<Course[]> {
-    const response = await fetch(`${API_URL}/courses`);
+    const response = await fetch(`${API_URL}/courses`, {
+      headers: getAuthHeaders(),
+    });
     if (!response.ok) throw new Error('Error al obtener cursos');
     return response.json();
   }
 
   static async getCoursesByStudent(userId: string): Promise<Course[]> {
-    const response = await fetch(`${API_URL}/users/${userId}/cursosdeunusuario`);
+    const response = await fetch(`${API_URL}/users/${userId}/cursosdeunusuario`, {
+      headers: getAuthHeaders(),
+    });
     if (!response.ok) throw new Error('Error al obtener cursos del estudiante');
     return response.json();
   }
@@ -334,9 +356,7 @@ export class ApiService {
   }): Promise<Evaluation> {
     const response = await fetch(`${API_URL}/evaluation/create`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: getAuthHeaders(),
       body: JSON.stringify(evaluationData),
     });
     if (!response.ok) throw new Error('Error al crear evaluación');
@@ -344,19 +364,25 @@ export class ApiService {
   }
 
   static async getEvaluations(): Promise<Evaluation[]> {
-    const response = await fetch(`${API_URL}/evaluation`);
+    const response = await fetch(`${API_URL}/evaluation`, {
+      headers: getAuthHeaders(),
+    });
     if (!response.ok) throw new Error('Error al obtener evaluaciones');
     return response.json();
   }
 
   static async getEvaluationById(id: string): Promise<EvaluationDetails> {
-    const response = await fetch(`${API_URL}/evaluation/${id}`);
+    const response = await fetch(`${API_URL}/evaluation/${id}`, {
+      headers: getAuthHeaders(),
+    });
     if (!response.ok) throw new Error('Error al obtener evaluación');
     return response.json();
   }
 
   static async getEvaluationChallenges(id: string): Promise<Challenge[]> {
-    const response = await fetch(`${API_URL}/evaluation/challenges/${id}`);
+    const response = await fetch(`${API_URL}/evaluation/challenges/${id}`, {
+      headers: getAuthHeaders(),
+    });
     if (!response.ok) throw new Error('Error al obtener challenges de la evaluación');
     return response.json();
   }
@@ -364,6 +390,7 @@ export class ApiService {
   static async deleteEvaluation(id: string): Promise<void> {
     const response = await fetch(`${API_URL}/evaluation/delete/${id}`, {
       method: 'DELETE',
+      headers: getAuthHeaders(),
     });
     if (!response.ok) throw new Error('Error al eliminar evaluación');
   }
@@ -371,6 +398,7 @@ export class ApiService {
   static async activateEvaluation(id: string): Promise<void> {
     const response = await fetch(`${API_URL}/evaluation/activate/${id}`, {
       method: 'PATCH',
+      headers: getAuthHeaders(),
     });
     if (!response.ok) throw new Error('Error al activar evaluación');
   }
@@ -378,12 +406,15 @@ export class ApiService {
   static async deactivateEvaluation(id: string): Promise<void> {
     const response = await fetch(`${API_URL}/evaluation/deactivate/${id}`, {
       method: 'PATCH',
+      headers: getAuthHeaders(),
     });
     if (!response.ok) throw new Error('Error al desactivar evaluación');
   }
 
   static async getActiveEvaluationsByStudent(userId: string): Promise<Evaluation[]> {
-    const response = await fetch(`${API_URL}/evaluation/student/${userId}`);
+    const response = await fetch(`${API_URL}/evaluation/student/${userId}`, {
+      headers: getAuthHeaders(),
+    });
     if (!response.ok) throw new Error('Error al obtener evaluaciones del estudiante');
     return response.json();
   }
@@ -396,7 +427,7 @@ export class ApiService {
   }): Promise<any> {
     const response = await fetch(`${API_URL}/evaluation/results`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: getAuthHeaders(),
       body: JSON.stringify(data),
     });
     if (!response.ok) throw new Error('Error al crear resultado de evaluación');
@@ -409,7 +440,7 @@ export class ApiService {
   ): Promise<any> {
     const response = await fetch(`${API_URL}/evaluation/results/${resultId}`, {
       method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
+      headers: getAuthHeaders(),
       body: JSON.stringify(data),
     });
     if (!response.ok) throw new Error('Error al actualizar resultado de evaluación');
@@ -417,7 +448,9 @@ export class ApiService {
   }
 
   static async getResultsByEvaluation(evaluationId: string): Promise<any[]> {
-    const response = await fetch(`${API_URL}/evaluation/results/${evaluationId}`);
+    const response = await fetch(`${API_URL}/evaluation/results/${evaluationId}`, {
+      headers: getAuthHeaders(),
+    });
     if (!response.ok) throw new Error('Error al obtener resultados de evaluación');
     return response.json();
   }
@@ -426,7 +459,9 @@ export class ApiService {
     evaluationId: string,
     userId: string
   ): Promise<any> {
-    const response = await fetch(`${API_URL}/evaluation/results/${evaluationId}/user/${userId}`);
+    const response = await fetch(`${API_URL}/evaluation/results/${evaluationId}/user/${userId}`, {
+      headers: getAuthHeaders(),
+    });
     if (!response.ok) throw new Error('Error al obtener resultado del estudiante');
     return response.json();
   }
@@ -434,6 +469,7 @@ export class ApiService {
   static async deleteEvaluationResult(resultId: string): Promise<void> {
     const response = await fetch(`${API_URL}/evaluation/results/${resultId}`, {
       method: 'DELETE',
+      headers: getAuthHeaders(),
     });
     if (!response.ok) throw new Error('Error al resetear resultado de evaluación');
   }

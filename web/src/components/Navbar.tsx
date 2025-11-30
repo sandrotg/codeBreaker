@@ -34,21 +34,25 @@ export function Navbar() {
             <span>Inicio</span>
           </Link>
 
-          <Link 
-            to="/challenges" 
-            className={`nav-link ${isActive('/challenges') ? 'active' : ''}`}
-          >
-            <List size={20} />
-            <span>Challenges</span>
-          </Link>
+          {isAuthenticated && (
+            <>
+              <Link 
+                to="/challenges" 
+                className={`nav-link ${isActive('/challenges') ? 'active' : ''}`}
+              >
+                <List size={20} />
+                <span>Challenges</span>
+              </Link>
 
-          <Link 
-            to="/evaluations" 
-            className={`nav-link ${isActive('/evaluations') ? 'active' : ''}`}
-          >
-            <BookOpen size={20} />
-            <span>Evaluaciones</span>
-          </Link>
+              <Link 
+                to="/evaluations" 
+                className={`nav-link ${isActive('/evaluations') ? 'active' : ''}`}
+              >
+                <BookOpen size={20} />
+                <span>Evaluaciones</span>
+              </Link>
+            </>
+          )}
         </div>
 
         <div className="navbar-auth">

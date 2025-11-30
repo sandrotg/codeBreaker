@@ -2,6 +2,7 @@ import { createContext, useContext, useState, useEffect } from 'react';
 import type { ReactNode } from 'react';
 import type { User } from '../types/auth.types';
 import { ApiService } from '../services/api.service';
+import { cookieUtils } from '../utils/cookies';
 
 interface AuthContextType {
   user: User | null;
@@ -19,13 +20,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [token, setToken] = useState<string | null>(null);
 
   useEffect(() => {
-    // Cargar token y usuario del localStorage al iniciar
-    const savedToken = localStorage.getItem('token');
-    const savedUser = localStorage.getItem('user');
+    // Cargar token y usuario de las cookies al iniciar
+    const savedToken = cookieUtils.get('token');
+    const savedUser = cookieUtils.get('user');
     
     if (savedToken && savedUser) {
-      setToken(savedToken);
-      setUser(JSON.parse(savedUser));
+      try {
+        setToken(savedToken);
+        setUser(JSON.parse(decodeURIComponent(savedUser)));
+      } catch (error) {
+        console.error('Error al parsear usuario de cookies:', error);
+        cookieUtils.clearAuth();
+      }
     }
   }, []);
 
@@ -38,9 +44,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       
       setUser(user);
       setToken(token.accessToken);
-      localStorage.setItem('user', JSON.stringify(user));
-      localStorage.setItem('token', token.accessToken);
-      localStorage.setItem('refreshToken', token.refreshToken);
+      
+      // Guardar en cookies (expiran en 7 días)
+      cookieUtils.set('user', encodeURIComponent(JSON.stringify(user)), 7);
+      cookieUtils.set('token', token.accessToken, 7);
+      cookieUtils.set('refreshToken', token.refreshToken, 7);
     } catch (error) {
       console.error('Error en login:', error);
       throw error;
@@ -62,8 +70,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = () => {
     setUser(null);
     setToken(null);
-    localStorage.removeItem('user');
-    localStorage.removeItem('token');
+    cookieUtils.clearAuth();
   };
 
   return (

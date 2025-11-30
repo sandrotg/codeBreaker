@@ -15,6 +15,7 @@ import { UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/presentation/shared/guards/jwt-auth.guard';
 import { RolesGuard } from 'src/presentation/shared/guards/roles.guard';
 import { Roles } from 'src/presentation/shared/decorators/roles.decorator';
+import { Public } from 'src/presentation/shared/decorators/public.decorator';
 import { roleName } from 'src/domain/users/entities/role.entity';
 import { GetCoursesByStudentUseCase } from 'src/application/users/use-cases/get-CoursesByStudent.use-case';
 @Controller("users")
@@ -35,6 +36,7 @@ export class UsersController {
   }
 
   // 🟢 PÚBLICO
+  @Public()
   @Post("login")
   async Login(@Body() body: LoginDto) {
     const result = await this.login.execute(body);
@@ -42,15 +44,15 @@ export class UsersController {
   }
 
   // 🟢 PÚBLICO
+  @Public()
   @Post('refresh-token')
   async refreshToken(@Body() body: RefreshTokenDTO) {
     const result = await this.refreshtoken.execute(body);
     return { user: result.user, token: result.tokens };
   }
 
-  // 🟢 O 🟡 DEPENDE DE TI
-  // Si solo admin crea usuarios, agrega Roles y guard.
-  // Si quieres registro público, déjalo así.
+  // 🟢 PÚBLICO (Registro de nuevos usuarios)
+  @Public()
   @Post('/create')
   async create(@Body() body: CreateUserDto) {
     return this.createUser.execute(body);
