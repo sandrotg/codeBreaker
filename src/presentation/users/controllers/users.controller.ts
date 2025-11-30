@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Query } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { LoginDto } from 'src/application/auth/dto/login.dto';
 import { LoginUseCase } from 'src/application/auth/use-cases/login.use-case';
@@ -15,8 +15,9 @@ import { UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/presentation/shared/guards/jwt-auth.guard';
 import { RolesGuard } from 'src/presentation/shared/guards/roles.guard';
 import { Roles } from 'src/presentation/shared/decorators/roles.decorator';
+import { Public } from 'src/presentation/shared/decorators/public.decorator';
 import { roleName } from 'src/domain/users/entities/role.entity';
-
+import { GetCoursesByStudentUseCase } from 'src/application/users/use-cases/get-CoursesByStudent.use-case';
 @Controller("users")
 export class UsersController {
   constructor(
@@ -24,10 +25,18 @@ export class UsersController {
     private readonly updateUser: UpdateUserUseCase,
     private readonly getUser: GetUserUseCase,
     private readonly createUser: CreateUserUseCase,
-    private readonly refreshtoken: RefreshTokenUseCase
+    private readonly refreshtoken: RefreshTokenUseCase,
+    private readonly getCoursesBy: GetCoursesByStudentUseCase
   ) {}
 
+
+  @Get(":id/cursosdeunusuario")
+  async cursosdeunusuario(@Param('id')userId:string){
+    return this.getCoursesBy.execute(userId)
+  }
+
   // 🟢 PÚBLICO
+  @Public()
   @Post("login")
   async Login(@Body() body: LoginDto) {
     const result = await this.login.execute(body);
@@ -35,15 +44,15 @@ export class UsersController {
   }
 
   // 🟢 PÚBLICO
+  @Public()
   @Post('refresh-token')
   async refreshToken(@Body() body: RefreshTokenDTO) {
     const result = await this.refreshtoken.execute(body);
     return { user: result.user, token: result.tokens };
   }
 
-  // 🟢 O 🟡 DEPENDE DE TI
-  // Si solo admin crea usuarios, agrega Roles y guard.
-  // Si quieres registro público, déjalo así.
+  // 🟢 PÚBLICO (Registro de nuevos usuarios)
+  @Public()
   @Post('/create')
   async create(@Body() body: CreateUserDto) {
     return this.createUser.execute(body);
@@ -74,10 +83,12 @@ export class UsersController {
   // 🔐 PROTEGIDO
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(roleName.ADMIN)
+  @ApiBearerAuth()
   @Get('/email/:email')
   async GetUserByEmail(@Param("email") email: string) {
     return this.getUser.execute({ email, criteria: 'email' });
   }
+
 }
 
 

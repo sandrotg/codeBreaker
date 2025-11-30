@@ -182,36 +182,6 @@ export function CreateChallengePage() {
         </div>
 
         <div className="form-section">
-          <h2>Entrada y Salida</h2>
-
-          <div className="form-group">
-            <label htmlFor="inputDescription">Descripción de la Entrada *</label>
-            <textarea
-              id="inputDescription"
-              name="inputDescription"
-              value={formData.inputDescription}
-              onChange={handleChange}
-              rows={4}
-              required
-              placeholder="Describe el formato de la entrada..."
-            />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="outputDescription">Descripción de la Salida *</label>
-            <textarea
-              id="outputDescription"
-              name="outputDescription"
-              value={formData.outputDescription}
-              onChange={handleChange}
-              rows={4}
-              required
-              placeholder="Describe el formato de la salida esperada..."
-            />
-          </div>
-        </div>
-
-        <div className="form-section">
           <h2>Límites</h2>
 
           <div className="form-row">
@@ -267,6 +237,7 @@ export function CreateChallengePage() {
                       title="Eliminar"
                     >
                       <X size={18} />
+                      <span className="btn-text">Eliminar</span>
                     </button>
                   )}
                 </div>

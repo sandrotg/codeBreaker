@@ -37,7 +37,8 @@ export class GetEvaluationUseCase {
             name: evaluation.name,
             startAt: evaluation.startAt,
             durationMinutes: evaluation.duration,
-            state,
+            state: evaluation.state, // Estado de la base de datos (Active/Inactive)
+            calculatedState: state, // Estado calculado basado en fechas
             expiresAt,
             startsIn
         };
