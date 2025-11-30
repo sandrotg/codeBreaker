@@ -66,6 +66,8 @@ services:
         npx prisma migrate deploy &&
         node dist/main.js
       "
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock      
 
   # --- Frontend (React + Vite) ---
   web:
