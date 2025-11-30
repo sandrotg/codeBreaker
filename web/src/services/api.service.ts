@@ -209,8 +209,9 @@ export class ApiService {
   static async createSubmission(submission: {
     user: string;
     challengeId: string;
-    language: string;
+    lenguage: string;
   }): Promise<Submission> {
+    console.log('Submitting:', submission);
     const response = await fetch(`${API_URL}/submissions`, {
       method: 'POST',
       headers: getAuthHeaders(),

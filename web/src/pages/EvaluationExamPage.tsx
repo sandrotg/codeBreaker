@@ -202,7 +202,7 @@ export function EvaluationExamPage() {
       const submission = await ApiService.createSubmission({
         user: user.userName,
         challengeId: currentChallenge.challengeId,
-        language
+        lenguage: language
       });
       
       // Guardar el ID de la submission
@@ -232,7 +232,7 @@ export function EvaluationExamPage() {
         const result = await ApiService.createSubmission({
           user: user!.userName,
           challengeId,
-          language: submission.language
+          lenguage: submission.language
         });
         
         if (result?.submissionId && !allSubmissionIds.includes(result.submissionId)) {

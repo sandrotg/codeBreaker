@@ -91,7 +91,7 @@ export function ChallengeDetailPage() {
       await ApiService.createSubmission({
         user: user.userId,
         challengeId: challenge.challengeId,
-        language: selectedLanguage,
+        lenguage: selectedLanguage,
       });
 
       // Simular resultado
