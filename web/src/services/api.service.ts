@@ -60,6 +60,7 @@ export interface Evaluation {
   name: string;
   startAt: Date;
   duration: number;
+  state: string;
   createdAt: Date;
 }
 
@@ -273,9 +274,52 @@ export class ApiService {
     return response.json();
   }
 
+  static async getCourseEvaluations(nrc: number): Promise<Evaluation[]> {
+    const response = await fetch(`${API_URL}/courses/evaluations/${nrc}`);
+    if (!response.ok) throw new Error('Error al obtener evaluaciones del curso');
+    return response.json();
+  }
+
   static async getAllCourses(): Promise<Course[]> {
     const response = await fetch(`${API_URL}/courses`);
     if (!response.ok) throw new Error('Error al obtener cursos');
+    return response.json();
+  }
+
+  static async getCoursesByStudent(userId: string): Promise<Course[]> {
+    const response = await fetch(`${API_URL}/users/${userId}/cursosdeunusuario`);
+    if (!response.ok) throw new Error('Error al obtener cursos del estudiante');
+    return response.json();
+  }
+
+  // ============ Authentication ============
+  static async login(email: string, password: string): Promise<{ user: User; token: { accessToken: string; refreshToken: string } }> {
+    const response = await fetch(`${API_URL}/users/login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email, password }),
+    });
+    if (!response.ok) {
+      const error = await response.text();
+      throw new Error(error || 'Error al iniciar sesión');
+    }
+    return response.json();
+  }
+
+  static async register(userName: string, email: string, password: string): Promise<User> {
+    const response = await fetch(`${API_URL}/users/create`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },// student
+      body: JSON.stringify({ userName, email, password, roleId: '597b2e7f-b95b-4ea3-95ff-15b61d64ce86' }),
+    });
+    if (!response.ok) {
+      const error = await response.text();
+      throw new Error(error || 'Error al registrar usuario');
+    }
     return response.json();
   }
 
@@ -286,6 +330,7 @@ export class ApiService {
     startAt: string;
     duration: number;
     challengeIds: string[];
+    courseIds: string[];
   }): Promise<Evaluation> {
     const response = await fetch(`${API_URL}/evaluation/create`, {
       method: 'POST',
@@ -310,10 +355,86 @@ export class ApiService {
     return response.json();
   }
 
+  static async getEvaluationChallenges(id: string): Promise<Challenge[]> {
+    const response = await fetch(`${API_URL}/evaluation/challenges/${id}`);
+    if (!response.ok) throw new Error('Error al obtener challenges de la evaluación');
+    return response.json();
+  }
+
   static async deleteEvaluation(id: string): Promise<void> {
     const response = await fetch(`${API_URL}/evaluation/delete/${id}`, {
       method: 'DELETE',
     });
     if (!response.ok) throw new Error('Error al eliminar evaluación');
+  }
+
+  static async activateEvaluation(id: string): Promise<void> {
+    const response = await fetch(`${API_URL}/evaluation/activate/${id}`, {
+      method: 'PATCH',
+    });
+    if (!response.ok) throw new Error('Error al activar evaluación');
+  }
+
+  static async deactivateEvaluation(id: string): Promise<void> {
+    const response = await fetch(`${API_URL}/evaluation/deactivate/${id}`, {
+      method: 'PATCH',
+    });
+    if (!response.ok) throw new Error('Error al desactivar evaluación');
+  }
+
+  static async getActiveEvaluationsByStudent(userId: string): Promise<Evaluation[]> {
+    const response = await fetch(`${API_URL}/evaluation/student/${userId}`);
+    if (!response.ok) throw new Error('Error al obtener evaluaciones del estudiante');
+    return response.json();
+  }
+
+  // Evaluation Results
+  static async createEvaluationResult(data: {
+    evaluationId: string;
+    userId: string;
+    totalChallenges: number;
+  }): Promise<any> {
+    const response = await fetch(`${API_URL}/evaluation/results`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    if (!response.ok) throw new Error('Error al crear resultado de evaluación');
+    return response.json();
+  }
+
+  static async updateEvaluationResult(
+    resultId: string,
+    data: { submissionIds: string[]; score: number }
+  ): Promise<any> {
+    const response = await fetch(`${API_URL}/evaluation/results/${resultId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    if (!response.ok) throw new Error('Error al actualizar resultado de evaluación');
+    return response.json();
+  }
+
+  static async getResultsByEvaluation(evaluationId: string): Promise<any[]> {
+    const response = await fetch(`${API_URL}/evaluation/results/${evaluationId}`);
+    if (!response.ok) throw new Error('Error al obtener resultados de evaluación');
+    return response.json();
+  }
+
+  static async getResultByUserAndEvaluation(
+    evaluationId: string,
+    userId: string
+  ): Promise<any> {
+    const response = await fetch(`${API_URL}/evaluation/results/${evaluationId}/user/${userId}`);
+    if (!response.ok) throw new Error('Error al obtener resultado del estudiante');
+    return response.json();
+  }
+
+  static async deleteEvaluationResult(resultId: string): Promise<void> {
+    const response = await fetch(`${API_URL}/evaluation/results/${resultId}`, {
+      method: 'DELETE',
+    });
+    if (!response.ok) throw new Error('Error al resetear resultado de evaluación');
   }
 }

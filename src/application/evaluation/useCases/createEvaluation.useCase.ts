@@ -1,4 +1,4 @@
-import { Evaluation } from 'src/domain/evaluations/entities/evaluation.entity';
+import { Evaluation, EvaluationState } from 'src/domain/evaluations/entities/evaluation.entity';
 import { randomUUID } from 'crypto';
 import { CreateEvaluationDto } from '../dto/createEvaluation.dto';
 import { EvaluationRepository } from 'src/domain/evaluations/repositories/evaluation.repository';
@@ -14,19 +14,28 @@ export class CreateEvaluationUseCase {
 
     async execute(input: CreateEvaluationDto): Promise<Evaluation> {
 
-        let parsedDate: Date | undefined;
+        let parsedDate: Date;
         const nowUTC = new Date();
         const offsetMinutes = 5 * 60;
 
         if (input.startAt) {
-            parsedDate = this.dateParser.parse(input.startAt);
+            // Intentar parsear como ISO primero (formato datetime-local)
+            parsedDate = new Date(input.startAt);
+            
+            // Si no es válido, intentar con el parser personalizado
+            if (isNaN(parsedDate.getTime())) {
+                parsedDate = this.dateParser.parse(input.startAt);
+            }
+        } else {
+            parsedDate = new Date();
         }
 
         const evaluation = new Evaluation(
             randomUUID(),
             input.name,
-            parsedDate || new Date(),
+            parsedDate,
             input.duration,
+            EvaluationState.INACTIVE,
             new Date(nowUTC.getTime() - offsetMinutes * 60 * 1000)
         );
 
@@ -43,6 +52,12 @@ export class CreateEvaluationUseCase {
 
         const savedEvaluation = await this.evaluationRepo.save(evaluation);
         await this.evaluationRepo.assignChallenges(savedEvaluation.evaluationId, input.challengeIds);
+        
+        // Asignar cursos si se proporcionaron
+        if (input.courseIds && input.courseIds.length > 0) {
+            await this.evaluationRepo.assignCourses(savedEvaluation.evaluationId, input.courseIds);
+        }
+        
         return savedEvaluation;
     }
 }

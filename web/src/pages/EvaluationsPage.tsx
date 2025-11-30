@@ -15,16 +15,26 @@ interface Challenge {
   state: string;
 }
 
+interface Course {
+  courseId: string;
+  title: string;
+  nrc: number;
+  period: string;
+  group: number;
+}
+
 interface EvaluationForm {
   name: string;
   startAt: string;
   duration: number;
   challengeIds: string[];
+  courseIds: string[];
 }
 
 export function CreateEvaluationPage() {
   const navigate = useNavigate();
   const [challenges, setChallenges] = useState<Challenge[]>([]);
+  const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -35,13 +45,15 @@ export function CreateEvaluationPage() {
     name: '',
     startAt: '',
     duration: 60,
-    challengeIds: []
+    challengeIds: [],
+    courseIds: []
   });
 
   const [selectedChallenges, setSelectedChallenges] = useState<Challenge[]>([]);
 
   useEffect(() => {
     loadChallenges();
+    loadCourses();
   }, []);
 
   const loadChallenges = async () => {
@@ -54,6 +66,15 @@ export function CreateEvaluationPage() {
       console.error(err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadCourses = async () => {
+    try {
+      const data = await ApiService.getAllCourses();
+      setCourses(data);
+    } catch (err) {
+      console.error('Error al cargar cursos:', err);
     }
   };
 
@@ -83,11 +104,25 @@ export function CreateEvaluationPage() {
     setSelectedChallenges(prev => prev.filter(ch => ch.challengeId !== challengeId));
   };
 
+  const handleCourseToggle = (courseId: string) => {
+    setFormData(prev => ({
+      ...prev,
+      courseIds: prev.courseIds.includes(courseId)
+        ? prev.courseIds.filter(id => id !== courseId)
+        : [...prev.courseIds, courseId]
+    }));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (formData.challengeIds.length === 0) {
       setError('Debes agregar al menos un challenge a la evaluación');
+      return;
+    }
+
+    if (formData.courseIds.length === 0) {
+      setError('Debes asignar la evaluación a al menos un curso');
       return;
     }
 
@@ -109,7 +144,8 @@ export function CreateEvaluationPage() {
         name: formData.name,
         startAt: formData.startAt,
         duration: formData.duration,
-        challengeIds: formData.challengeIds
+        challengeIds: formData.challengeIds,
+        courseIds: formData.courseIds
       };
 
       // Llamada REAL al endpoint
@@ -251,12 +287,11 @@ export function CreateEvaluationPage() {
               <label htmlFor="startAt">Fecha y Hora de Inicio *</label>
               <input
                 id="startAt"
-                type="text"
+                type="datetime-local"
                 name="startAt"
                 value={formData.startAt}
                 onChange={handleInputChange}
                 required
-                placeholder="Ej: 15 de octubre, 10:00 a.m."
               />
             </div>
 
@@ -274,6 +309,36 @@ export function CreateEvaluationPage() {
               />
             </div>
           </div>
+        </div>
+
+        <div className="form-section">
+          <h2>Asignar a Cursos</h2>
+          <p className="section-description">Selecciona los cursos a los que se asignará esta evaluación</p>
+          
+          {courses.length === 0 ? (
+            <div className="no-courses">
+              <p>No hay cursos disponibles</p>
+            </div>
+          ) : (
+            <div className="courses-selection">
+              {courses.map((course) => (
+                <div key={course.courseId} className="course-checkbox">
+                  <input
+                    type="checkbox"
+                    id={`course-${course.courseId}`}
+                    checked={formData.courseIds.includes(course.courseId)}
+                    onChange={() => handleCourseToggle(course.courseId)}
+                  />
+                  <label htmlFor={`course-${course.courseId}`}>
+                    <strong>{course.title}</strong>
+                    <span className="course-details">
+                      NRC: {course.nrc} • Grupo: {course.group} • {course.period}
+                    </span>
+                  </label>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         <div className="form-section">

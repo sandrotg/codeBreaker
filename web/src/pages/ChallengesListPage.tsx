@@ -2,9 +2,11 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ApiService, type Challenge } from '../services/api.service';
 import { Search, Filter, Eye, Edit, Trash2, Clock, Database, X, AlertTriangle, Sparkles } from 'lucide-react';
+import { useRole } from '../hooks/useRole';
 import './ChallengesListPage.css';
 
 export function ChallengesListPage() {
+  const { canCreateChallenges, canGenerateChallenges, canEditChallenges, canDeleteChallenges } = useRole();
   const [challenges, setChallenges] = useState<Challenge[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -149,15 +151,21 @@ export function ChallengesListPage() {
 
       <div className="page-header">
         <h1>Challenges</h1>
-        <div className="header-actions">
-          <Link to="/ai-generate" className="btn-ai">
-            <Sparkles size={18} />
-            Generar Challenge con IA
-          </Link>
-          <Link to="/challenges/create" className="btn-primary">
-            + Nuevo Challenge
-          </Link>
-        </div>
+        {(canCreateChallenges || canGenerateChallenges) && (
+          <div className="header-actions">
+            {canGenerateChallenges && (
+              <Link to="/ai-generate" className="btn-ai">
+                <Sparkles size={18} />
+                Generar Challenge con IA
+              </Link>
+            )}
+            {canCreateChallenges && (
+              <Link to="/challenges/create" className="btn-primary">
+                + Nuevo Challenge
+              </Link>
+            )}
+          </div>
+        )}
       </div>
 
       <div className="filters-section">
@@ -243,20 +251,22 @@ export function ChallengesListPage() {
                 <Eye size={18} />
               </Link>
               
-              {/* Solo mostrar botón de editar si el challenge NO está publicado */}
-              {canEditChallenge(challenge) && (
+              {/* Solo mostrar botón de editar si el challenge NO está publicado Y el usuario tiene permisos */}
+              {canEditChallenges && canEditChallenge(challenge) && (
                 <Link to={`/challenges/${challenge.challengeId}/edit`} className="btn-icon" title="Editar">
                   <Edit size={18} />
                 </Link>
               )}
               
-              <button 
-                onClick={() => openDeleteModal(challenge)} 
-                className="btn-icon btn-danger"
-                title="Eliminar"
-              >
-                <Trash2 size={18} />
-              </button>
+              {canDeleteChallenges && (
+                <button 
+                  onClick={() => openDeleteModal(challenge)} 
+                  className="btn-icon btn-danger"
+                  title="Eliminar"
+                >
+                  <Trash2 size={18} />
+                </button>
+              )}
             </div>
           </div>
         ))}
@@ -265,9 +275,11 @@ export function ChallengesListPage() {
       {filteredChallenges.length === 0 && (
         <div className="empty-state">
           <p>No se encontraron challenges</p>
-          <Link to="/ai-generate" className="btn-primary">
-            Generar con IA
-          </Link>
+          {canGenerateChallenges && (
+            <Link to="/ai-generate" className="btn-primary">
+              Generar con IA
+            </Link>
+          )}
         </div>
       )}
     </div>

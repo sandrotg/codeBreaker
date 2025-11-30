@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Home, List, Sparkles, LogIn, LogOut, User } from 'lucide-react';
+import { Home, List, Sparkles, LogIn, LogOut, User, BookOpen } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import './Navbar.css';
 
@@ -7,6 +7,8 @@ export function Navbar() {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, isAuthenticated, logout } = useAuth();
+
+  console.log('🔄 Navbar render - isAuthenticated:', isAuthenticated, 'user:', user);
 
   const isActive = (path: string) => location.pathname === path;
 
@@ -38,6 +40,14 @@ export function Navbar() {
           >
             <List size={20} />
             <span>Challenges</span>
+          </Link>
+
+          <Link 
+            to="/evaluations" 
+            className={`nav-link ${isActive('/evaluations') ? 'active' : ''}`}
+          >
+            <BookOpen size={20} />
+            <span>Evaluaciones</span>
           </Link>
         </div>
 

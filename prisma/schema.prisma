@@ -28,7 +28,6 @@ model User {
 model Role {
   roleId            String  @id
   name              roleName
-  permissions       Permission[]
   user              User[]
 }
 
@@ -72,13 +71,6 @@ model EvaluationCourse {
   @@unique([evaluationId, courseId])
 }
 
-model Permission{
-  permissionId      String  @id
-  roleId            String
-  name              String
-  description       String
-  rol               Role     @relation(fields:[roleId], references:[roleId])
-}
 
 model Challenge {
   challengeId       String  @id
@@ -144,9 +136,28 @@ model Evaluation {
   name              String
   startAt           DateTime
   duration          Int
+  state             EvaluationState @default(Inactive)
   challenges        EvaluationChallenge[] 
   createdAt         DateTime @default(now())
   courses           EvaluationCourse[]
+  results           EvaluationResult[]
+}
+
+model EvaluationResult {
+  resultId          String   @id @default(cuid())
+  evaluationId      String
+  userId            String
+  submissionIds     String[]
+  score             Float?
+  totalChallenges   Int
+  startedAt         DateTime @default(now())
+  completedAt       DateTime?
+  
+  evaluation        Evaluation @relation(fields: [evaluationId], references: [evaluationId])
+  
+  @@unique([evaluationId, userId])
+  @@index([evaluationId])
+  @@index([userId])
 }
 
 model EvaluationChallenge {
@@ -190,6 +201,7 @@ enum StatusSubmission {
 enum roleName {
   Admin
   Student
+  Professor
 }
 
 enum JobStatus {
@@ -197,4 +209,9 @@ enum JobStatus {
   PROCESSING
   COMPLETED
   FAILED
+}
+
+enum EvaluationState {
+  Active
+  Inactive
 }

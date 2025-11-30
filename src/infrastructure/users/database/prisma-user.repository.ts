@@ -44,19 +44,36 @@ async findCoursesByStudent(userId: string): Promise<Course[]> {
         return new User(
             saved.userId,
             saved.userName,
+            saved.email,
             saved.passwordHash,
             saved.roleId,
-            saved.email,
             saved.createdAt
         )
     }
     async findUserByEmail(email: string): Promise<User | null> {
-       return await this.prisma.user.findUnique({where:{email}})
-        
+        const user = await this.prisma.user.findUnique({where:{email}});
+        if (!user) return null;
+        return new User(
+            user.userId,
+            user.userName,
+            user.email,
+            user.passwordHash,
+            user.roleId,
+            user.createdAt
+        );
     }
 
     async findUserById(userId: string): Promise<User | null> {
-        return await this.prisma.user.findUnique({where:{userId}})
+        const user = await this.prisma.user.findUnique({where:{userId}});
+        if (!user) return null;
+        return new User(
+            user.userId,
+            user.userName,
+            user.email,
+            user.passwordHash,
+            user.roleId,
+            user.createdAt
+        );
     }
 
     async update(user: User): Promise<User> {
@@ -76,9 +93,9 @@ async findCoursesByStudent(userId: string): Promise<Course[]> {
         return new User(
             updatedUser.userId,
             updatedUser.userName,
+            updatedUser.email,
             updatedUser.passwordHash,
             updatedUser.roleId,
-            updatedUser.email,
             updatedUser.createdAt
         )
     }

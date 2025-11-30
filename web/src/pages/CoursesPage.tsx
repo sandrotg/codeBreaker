@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import { ApiService } from '../services/api.service';
 import { Link } from 'react-router-dom';
-import {Plus, Users, Book, X, Search, Eye } from 'lucide-react';
+import { Plus, Users, Book, X, Search, Eye } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
+import { useRole } from '../hooks/useRole';
 import './CoursesPage.css';
 
 interface Course {
@@ -31,14 +33,17 @@ interface User {
 }
 
 export function CoursesPage() {
+  const { user } = useAuth();
+  const { isAdmin, canCreateCourses } = useRole();
   const [courses, setCourses] = useState<Course[]>([]);
   const [challenges, setChallenges] = useState<Challenge[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'users' | 'challenges'>('users');
+  const [activeTab, setActiveTab] = useState<'users' | 'challenges' | 'evaluations'>('users');
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
   const [courseUsers, setCourseUsers] = useState<User[]>([]);
   const [courseChallenges, setCourseChallenges] = useState<Challenge[]>([]);
+  const [courseEvaluations, setCourseEvaluations] = useState<any[]>([]);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showAddUsersModal, setShowAddUsersModal] = useState(false);
   const [showAddChallengesModal, setShowAddChallengesModal] = useState(false);
@@ -56,12 +61,23 @@ export function CoursesPage() {
   useEffect(() => {
     loadCourses();
     loadAllChallenges();
-  }, []);
+  }, [isAdmin, user?.userId]);
 
   const loadCourses = async () => {
     try {
       setLoading(true);
-      const data = await ApiService.getAllCourses();
+      let data;
+      
+      if (isAdmin) {
+        // Admin ve todos los cursos
+        data = await ApiService.getAllCourses();
+      } else if (user?.userId) {
+        // Estudiante ve solo sus cursos
+        data = await ApiService.getCoursesByStudent(user.userId);
+      } else {
+        data = [];
+      }
+      
       setCourses(data);
       setError(null);
     } catch (err) {
@@ -92,6 +108,10 @@ export function CoursesPage() {
       // Cargar challenges del curso
       const courseChallengesData = await ApiService.getCourseChallenges(course.nrc);
       setCourseChallenges(courseChallengesData);
+
+      // Cargar evaluaciones del curso
+      const evaluations = await ApiService.getCourseEvaluations(course.nrc);
+      setCourseEvaluations(evaluations);
     } catch (err) {
       console.error('Error al cargar detalles del curso:', err);
       setError('Error al cargar los detalles del curso');
@@ -177,6 +197,18 @@ export function CoursesPage() {
     return (
       <div className="courses-page">
         <div className="loading">Cargando cursos...</div>
+      </div>
+    );
+  }
+
+  // Si es estudiante y no tiene cursos asignados
+  if (!isAdmin && courses.length === 0) {
+    return (
+      <div className="courses-page">
+        <div className="empty-courses-message">
+          <h2>No tienes cursos asignados</h2>
+          <p>Por favor, espera a que un administrador te asigne a un curso.</p>
+        </div>
       </div>
     );
   }
@@ -342,10 +374,12 @@ export function CoursesPage() {
 
       <div className="page-header">
         <h1>Gestión de Cursos</h1>
-        <button onClick={() => setShowCreateModal(true)} className="btn-primary">
-          <Plus size={18} />
-          Crear Curso
-        </button>
+        {canCreateCourses && (
+          <button onClick={() => setShowCreateModal(true)} className="btn-primary">
+            <Plus size={18} />
+            Crear Curso
+          </button>
+        )}
       </div>
 
       {error && (
@@ -387,22 +421,24 @@ export function CoursesPage() {
                     NRC: {selectedCourse.nrc} • Grupo: {selectedCourse.group} • Periodo: {selectedCourse.period}
                   </p>
                 </div>
-                <div className="course-actions">
-                  <button
-                    onClick={() => setShowAddUsersModal(true)}
-                    className="btn-secondary"
-                  >
-                    <Users size={16} />
-                    Agregar Usuarios
-                  </button>
-                  <button
-                    onClick={() => setShowAddChallengesModal(true)}
-                    className="btn-secondary"
-                  >
-                    <Book size={16} />
-                    Agregar Challenges
-                  </button>
-                </div>
+                {canCreateCourses && (
+                  <div className="course-actions">
+                    <button
+                      onClick={() => setShowAddUsersModal(true)}
+                      className="btn-secondary"
+                    >
+                      <Users size={16} />
+                      Agregar Usuarios
+                    </button>
+                    <button
+                      onClick={() => setShowAddChallengesModal(true)}
+                      className="btn-secondary"
+                    >
+                      <Book size={16} />
+                      Agregar Challenges
+                    </button>
+                  </div>
+                )}
               </div>
 
               <div className="tabs">
@@ -417,6 +453,12 @@ export function CoursesPage() {
                   onClick={() => setActiveTab('challenges')}
                 >
                   Challenges ({courseChallenges.length})
+                </button>
+                <button
+                  className={`tab ${activeTab === 'evaluations' ? 'active' : ''}`}
+                  onClick={() => setActiveTab('evaluations')}
+                >
+                  Evaluaciones ({courseEvaluations.length})
                 </button>
               </div>
 
@@ -469,6 +511,36 @@ export function CoursesPage() {
                               to={`/challenges/${challenge.challengeId}`}
                               className="btn-view"
                               title="Ver detalles del challenge"
+                            >
+                              <Eye size={16} />
+                            </Link>
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                )}
+
+                {activeTab === 'evaluations' && (
+                  <div className="evaluations-list">
+                    <h4>Evaluaciones del Curso ({courseEvaluations.length})</h4>
+                    {courseEvaluations.length === 0 ? (
+                      <p className="no-data">No hay evaluaciones asignadas a este curso</p>
+                    ) : (
+                      courseEvaluations.map((evaluation) => (
+                        <div key={evaluation.evaluationId} className="course-evaluation-item">
+                          <div className="evaluation-info">
+                            <h5>{evaluation.name || 'Sin nombre'}</h5>
+                            <div className="evaluation-meta">
+                              <span>Inicio: {new Date(evaluation.startAt).toLocaleString('es-ES')}</span>
+                              <span>Duración: {evaluation.durationMinutes || 0} min</span>
+                            </div>
+                          </div>
+                          <div className="evaluation-actions">
+                            <Link
+                              to={`/evaluations/${evaluation.evaluationId}`}
+                              className="btn-view"
+                              title="Ver detalles de la evaluación"
                             >
                               <Eye size={16} />
                             </Link>

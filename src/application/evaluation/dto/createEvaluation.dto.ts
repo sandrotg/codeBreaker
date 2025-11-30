@@ -35,4 +35,15 @@ export class CreateEvaluationDto {
         ]
     })
     challengeIds: string[];
+
+  @IsArray()
+  @ApiProperty({
+        type: [String],
+        example: [
+            "course-uuid-1",
+            "course-uuid-2"
+        ],
+        description: 'IDs de los cursos a los que se asignará la evaluación'
+    })
+    courseIds: string[];
 }

@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ApiService } from '../services/api.service';
-import { Plus, Calendar, Clock, Eye, Trash2, X, AlertTriangle } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
+import { useRole } from '../hooks/useRole';
+import { Plus, Calendar, Clock, Eye, Trash2, X, AlertTriangle, Power, PowerOff, Play, BarChart } from 'lucide-react';
 import './ListEvalPage.css';
 
 interface Evaluation {
@@ -9,12 +11,14 @@ interface Evaluation {
   name: string;
   startAt: Date;
   duration: number;
+  state: string;
   createdAt: Date;
 }
 
 export function EvaluationsListPage() {
+  const { user } = useAuth();
+  const { isAdmin } = useRole();
   const [evaluations, setEvaluations] = useState<Evaluation[]>([]);
-  const [evaluationStates, setEvaluationStates] = useState<{[key: string]: string}>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [deleteModal, setDeleteModal] = useState<{ isOpen: boolean; evaluation: Evaluation | null }>({
@@ -29,22 +33,19 @@ export function EvaluationsListPage() {
   const loadEvaluations = async () => {
     try {
       setLoading(true);
-      const data = await ApiService.getEvaluations();
-      setEvaluations(data);
+      let data;
       
-      // Cargar estados de cada evaluación
-      const states: {[key: string]: string} = {};
-      for (const evaluation of data) {
-        try {
-          const details = await ApiService.getEvaluationById(evaluation.evaluationId);
-          states[evaluation.evaluationId] = details.state;
-        } catch (err) {
-          console.error(`Error al cargar estado de evaluación ${evaluation.evaluationId}:`, err);
-          states[evaluation.evaluationId] = 'no_activo';
-        }
+      if (isAdmin) {
+        // Admin ve todas las evaluaciones
+        data = await ApiService.getEvaluations();
+      } else if (user?.userId) {
+        // Estudiante ve solo evaluaciones activas de sus cursos
+        data = await ApiService.getActiveEvaluationsByStudent(user.userId);
+      } else {
+        data = [];
       }
-      setEvaluationStates(states);
       
+      setEvaluations(data);
       setError(null);
     } catch (err) {
       setError('Error al cargar las evaluaciones');
@@ -82,6 +83,20 @@ export function EvaluationsListPage() {
     }
   };
 
+  const handleToggleState = async (evaluationId: string, currentState: string) => {
+    try {
+      if (currentState === 'Active') {
+        await ApiService.deactivateEvaluation(evaluationId);
+      } else {
+        await ApiService.activateEvaluation(evaluationId);
+      }
+      await loadEvaluations(); // Recargar lista
+    } catch (err) {
+      alert('Error al cambiar el estado de la evaluación');
+      console.error(err);
+    }
+  };
+
   const formatDuration = (minutes: number) => {
     const hours = Math.floor(minutes / 60);
     const mins = minutes % 60;
@@ -102,25 +117,17 @@ export function EvaluationsListPage() {
   };
 
   const getStatusBadge = (state: string) => {
-    switch (state) {
-      case 'activo':
-        return 'status-active';
-      case 'no_activo':
-        return 'status-inactive';
-      default:
-        return 'status-inactive';
-    }
+    return state === 'Active' ? 'status-active' : 'status-inactive';
   };
 
   const getStatusText = (state: string) => {
-    switch (state) {
-      case 'activo':
-        return 'Activa';
-      case 'no_activo':
-        return 'Inactiva';
-      default:
-        return 'Inactiva';
-    }
+    return state === 'Active' ? 'Activa' : 'Inactiva';
+  };
+
+  const isEvaluationFinished = (evaluationId: string): boolean => {
+    if (!user?.userId) return false;
+    const finishedKey = `evaluation_finished_${evaluationId}_${user.userId}`;
+    return localStorage.getItem(finishedKey) === 'true';
   };
 
   if (loading) {
@@ -178,10 +185,12 @@ export function EvaluationsListPage() {
 
       <div className="page-header">
         <h1>Evaluaciones</h1>
-        <Link to="/evaluations/create" className="btn-primary">
-          <Plus size={18} />
-          Nueva Evaluación
-        </Link>
+        {isAdmin && (
+          <Link to="/evaluations/create" className="btn-primary">
+            <Plus size={18} />
+            Nueva Evaluación
+          </Link>
+        )}
       </div>
 
       <div className="evaluations-count">
@@ -193,22 +202,38 @@ export function EvaluationsListPage() {
           <div key={evaluation.evaluationId} className="evaluation-card">
             <div className="evaluation-header">
               <h3>{evaluation.name}</h3>
-              <div className="evaluation-actions">
-                <Link 
-                  to={`/evaluations/${evaluation.evaluationId}`}
-                  className="btn-icon"
-                  title="Ver detalles"
-                >
-                  <Eye size={18} />
-                </Link>
-                <button 
-                  onClick={() => openDeleteModal(evaluation)}
-                  className="btn-icon btn-danger"
-                  title="Eliminar"
-                >
-                  <Trash2 size={18} />
-                </button>
-              </div>
+              {isAdmin && (
+                <div className="evaluation-actions">
+                  <Link 
+                    to={`/evaluations/${evaluation.evaluationId}/results`}
+                    className="btn-icon btn-info"
+                    title="Ver resultados"
+                  >
+                    <BarChart size={18} />
+                  </Link>
+                  <Link 
+                    to={`/evaluations/${evaluation.evaluationId}`}
+                    className="btn-icon"
+                    title="Ver detalles"
+                  >
+                    <Eye size={18} />
+                  </Link>
+                  <button
+                    onClick={() => handleToggleState(evaluation.evaluationId, evaluation.state)}
+                    className={`btn-icon ${evaluation.state === 'Active' ? 'btn-warning' : 'btn-success'}`}
+                    title={evaluation.state === 'Active' ? 'Desactivar' : 'Activar'}
+                  >
+                    {evaluation.state === 'Active' ? <PowerOff size={18} /> : <Power size={18} />}
+                  </button>
+                  <button 
+                    onClick={() => openDeleteModal(evaluation)}
+                    className="btn-icon btn-danger"
+                    title="Eliminar"
+                  >
+                    <Trash2 size={18} />
+                  </button>
+                </div>
+              )}
             </div>
 
             <div className="evaluation-meta">
@@ -223,23 +248,51 @@ export function EvaluationsListPage() {
             </div>
 
             <div className="evaluation-footer">
-              <div className={`status-badge ${getStatusBadge(evaluationStates[evaluation.evaluationId] || 'no_activo')}`}>
-                {getStatusText(evaluationStates[evaluation.evaluationId] || 'no_activo')}
+              <div className={`status-badge ${getStatusBadge(evaluation.state)}`}>
+                {getStatusText(evaluation.state)}
               </div>
+              {!isAdmin && (
+                isEvaluationFinished(evaluation.evaluationId) ? (
+                  <button 
+                    className="btn-start-evaluation btn-disabled"
+                    disabled
+                  >
+                    <Play size={18} />
+                    Finalizada
+                  </button>
+                ) : (
+                  <Link 
+                    to={`/evaluations/${evaluation.evaluationId}/exam`}
+                    className="btn-start-evaluation"
+                  >
+                    <Play size={18} />
+                    Empezar Evaluación
+                  </Link>
+                )
+              )}
             </div>
           </div>
         ))}
       </div>
 
-      {evaluations.length === 0 && (
+      {evaluations.length === 0 && !loading && (
         <div className="empty-state">
           <Calendar size={64} />
-          <h3>No hay evaluaciones creadas</h3>
-          <p>Crea tu primera evaluación para comenzar a gestionar tus tests.</p>
-          <Link to="/evaluations/create" className="btn-primary">
-            <Plus size={18} />
-            Crear Primera Evaluación
-          </Link>
+          {isAdmin ? (
+            <>
+              <h3>No hay evaluaciones creadas</h3>
+              <p>Crea tu primera evaluación para comenzar a gestionar tus tests.</p>
+              <Link to="/evaluations/create" className="btn-primary">
+                <Plus size={18} />
+                Crear Primera Evaluación
+              </Link>
+            </>
+          ) : (
+            <>
+              <h3>No tienes evaluaciones activas</h3>
+              <p>No hay evaluaciones activas asignadas a tus cursos en este momento.</p>
+            </>
+          )}
         </div>
       )}
     </div>

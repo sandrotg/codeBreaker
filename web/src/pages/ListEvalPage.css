@@ -118,6 +118,39 @@
   color: #721c24;
 }
 
+.btn-success {
+  background: #d4edda;
+  color: #155724;
+  border-color: #c3e6cb;
+}
+
+.btn-success:hover {
+  background: #c3e6cb;
+  color: #155724;
+}
+
+.btn-warning {
+  background: #fff3cd;
+  color: #856404;
+  border-color: #ffeeba;
+}
+
+.btn-warning:hover {
+  background: #ffeeba;
+  color: #856404;
+}
+
+.btn-info {
+  background: #d1ecf1;
+  color: #0c5460;
+  border-color: #bee5eb;
+}
+
+.btn-info:hover {
+  background: #bee5eb;
+  color: #0c5460;
+}
+
 .evaluation-meta {
   display: flex;
   flex-direction: column;
@@ -198,6 +231,45 @@
   align-items: center;
   padding-top: 1rem;
   border-top: 1px solid #f0f0f0;
+  gap: 1rem;
+}
+
+.btn-start-evaluation {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.2rem;
+  background: #10b981;
+  color: white;
+  text-decoration: none;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-start-evaluation:hover {
+  background: #059669;
+  transform: translateY(-1px);
+  color: white;
+  text-decoration: none;
+}
+
+.btn-start-evaluation.btn-disabled,
+.btn-start-evaluation:disabled {
+  background: #9ca3af;
+  color: #e5e7eb;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.btn-start-evaluation.btn-disabled:hover,
+.btn-start-evaluation:disabled:hover {
+  background: #9ca3af;
+  transform: none;
+  color: #e5e7eb;
 }
 
 .evaluation-id {

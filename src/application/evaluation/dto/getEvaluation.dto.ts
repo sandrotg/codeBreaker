@@ -14,10 +14,18 @@ export class EvaluationResponseDto {
     durationMinutes: number;
 
     @ApiProperty({
-        example: "activo",
-        enum: ["no_disponible", "activo", "no_activo"],
+        example: "Active",
+        enum: ["Active", "Inactive"],
+        description: "Estado de la evaluación en la base de datos"
     })
     state: string;
+
+    @ApiProperty({
+        example: "activo",
+        enum: ["no_disponible", "activo", "no_activo"],
+        description: "Estado calculado basado en fechas"
+    })
+    calculatedState: string;
 
     @ApiProperty({ example: "2025-01-15T11:30:00.000Z" })
     expiresAt: Date;

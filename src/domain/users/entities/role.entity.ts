@@ -8,6 +8,7 @@ export class Role {
 export enum roleName {
     ADMIN =  'Admin',
     STUDENT = 'Student',
+    PROFESSOR = 'Professor'
 }
 
 

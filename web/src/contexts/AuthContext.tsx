@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import type { ReactNode } from 'react';
 import type { User } from '../types/auth.types';
+import { ApiService } from '../services/api.service';
 
 interface AuthContextType {
   user: User | null;
@@ -28,37 +29,34 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  const login = async (email: string, _password: string) => {
-    // TODO: Implementar llamada real al backend cuando esté listo
-    // Por ahora, simulamos el login
-    const mockUser: User = {
-      userId: '1',
-      userName: email.split('@')[0],
-      email: email,
-      roleId: 'student',
-    };
-    const mockToken = 'mock-jwt-token-' + Date.now();
-
-    setUser(mockUser);
-    setToken(mockToken);
-    localStorage.setItem('user', JSON.stringify(mockUser));
-    localStorage.setItem('token', mockToken);
+  const login = async (email: string, password: string) => {
+    try {
+      const response = await ApiService.login(email, password);
+      const { user, token } = response;
+      
+      console.log('✅ Login exitoso:', user);
+      
+      setUser(user);
+      setToken(token.accessToken);
+      localStorage.setItem('user', JSON.stringify(user));
+      localStorage.setItem('token', token.accessToken);
+      localStorage.setItem('refreshToken', token.refreshToken);
+    } catch (error) {
+      console.error('Error en login:', error);
+      throw error;
+    }
   };
 
-  const register = async (userName: string, email: string, _password: string) => {
-    // TODO: Implementar llamada real al backend
-    const mockUser: User = {
-      userId: '1',
-      userName,
-      email,
-      roleId: 'student',
-    };
-    const mockToken = 'mock-jwt-token-' + Date.now();
-
-    setUser(mockUser);
-    setToken(mockToken);
-    localStorage.setItem('user', JSON.stringify(mockUser));
-    localStorage.setItem('token', mockToken);
+  const register = async (userName: string, email: string, password: string) => {
+    try {
+      const user = await ApiService.register(userName, email, password);
+      
+      // Después del registro exitoso, hacer login automáticamente
+      await login(email, password);
+    } catch (error) {
+      console.error('Error en registro:', error);
+      throw error;
+    }
   };
 
   const logout = () => {

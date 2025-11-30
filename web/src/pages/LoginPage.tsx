@@ -28,7 +28,8 @@ export function LoginPage() {
       } else {
         await register(formData.userName, formData.email, formData.password);
       }
-      navigate('/');
+      // Forzar recarga para actualizar el navbar
+      window.location.href = '/';
     } catch (err) {
       setError('Error al autenticar. Verifica tus credenciales.');
       console.error(err);

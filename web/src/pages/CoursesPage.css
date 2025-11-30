@@ -219,6 +219,66 @@
   border: 1px solid #e0e0e0;
   border-radius: 8px;
   margin-bottom: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.course-evaluation-item {
+  padding: 1rem;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.course-evaluation-item:hover {
+  border-color: #667eea;
+  background: #f8f9ff;
+}
+
+.evaluation-info h5 {
+  margin: 0 0 0.5rem 0;
+  color: #333;
+  font-size: 1.1rem;
+}
+
+.evaluation-meta {
+  display: flex;
+  gap: 1.5rem;
+  margin-top: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.evaluation-meta span {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.evaluation-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.btn-view {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem;
+  background: #667eea;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-decoration: none;
+}
+
+.btn-view:hover {
+  background: #5568d3;
+  transform: scale(1.05);
 }
 
 .challenge-info h5 {
@@ -467,6 +527,28 @@
   text-align: center;
   padding: 2rem;
   color: #666;
+}
+
+.empty-courses-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  text-align: center;
+  padding: 2rem;
+}
+
+.empty-courses-message h2 {
+  font-size: 2rem;
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+.empty-courses-message p {
+  font-size: 1.2rem;
+  color: #666;
+  max-width: 500px;
 }
 
 .error {
