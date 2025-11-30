@@ -57,7 +57,7 @@ export function EvaluationResultsPage() {
     }
   };
 
-  const handleResetResult = async (resultId: string, userId: string) => {
+  const handleResetResult = async (resultId: string) => {
     if (!window.confirm('\u00bfEst\u00e1s seguro de que quieres resetear este resultado? El estudiante podr\u00e1 volver a realizar la evaluaci\u00f3n.')) {
       return;
     }
@@ -226,7 +226,7 @@ export function EvaluationResultsPage() {
                   <td>
                     {result.completedAt && (
                       <button
-                        onClick={() => handleResetResult(result.resultId, result.userId)}
+                        onClick={() => handleResetResult(result.resultId)}
                         className="btn-reset"
                         title="Resetear evaluación"
                       >

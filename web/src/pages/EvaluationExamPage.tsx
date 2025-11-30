@@ -22,7 +22,6 @@ interface EvaluationDetails {
   startAt: string;
   durationMinutes: number;
   state: string;
-  calculatedState: string;
   expiresAt: string;
 }
 
@@ -201,9 +200,8 @@ export function EvaluationExamPage() {
     
     try {
       const submission = await ApiService.createSubmission({
-        userId: user.userId,
+        user: user.userName,
         challengeId: currentChallenge.challengeId,
-        code,
         language
       });
       
@@ -232,9 +230,8 @@ export function EvaluationExamPage() {
     for (const [challengeId, submission] of submissions.entries()) {
       try {
         const result = await ApiService.createSubmission({
-          userId: user!.userId,
+          user: user!.userName,
           challengeId,
-          code: submission.code,
           language: submission.language
         });
         

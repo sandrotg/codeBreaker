@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { LogIn, UserPlus } from 'lucide-react';
 import './LoginPage.css';
@@ -15,7 +14,6 @@ export function LoginPage() {
   const [error, setError] = useState<string | null>(null);
 
   const { login, register } = useAuth();
-  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

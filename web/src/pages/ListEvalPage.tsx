@@ -33,7 +33,7 @@ export function EvaluationsListPage() {
   const loadEvaluations = async () => {
     try {
       setLoading(true);
-      let data;
+      let data: any;
       
       if (isAdmin) {
         // Admin ve todas las evaluaciones

@@ -66,7 +66,7 @@ export function CoursesPage() {
   const loadCourses = async () => {
     try {
       setLoading(true);
-      let data;
+      let data:any;
       
       if (isAdmin) {
         // Admin ve todos los cursos

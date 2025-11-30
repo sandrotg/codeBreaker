@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Book, ClipboardList, List, Zap, Code, TrendingUp, Award, Target } from 'lucide-react';
+import { Book, ClipboardList, Zap, Code, TrendingUp, Award, Target } from 'lucide-react';
 import { useRole } from '../hooks/useRole';
 import { useAuth } from '../contexts/AuthContext';
 import './HomePage.css';

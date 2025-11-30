@@ -57,9 +57,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const register = async (userName: string, email: string, password: string) => {
     try {
-      const user = await ApiService.register(userName, email, password);
-      
-      // Después del registro exitoso, hacer login automáticamente
+      await ApiService.register(userName, email, password);
       await login(email, password);
     } catch (error) {
       console.error('Error en registro:', error);
