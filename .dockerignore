@@ -1,4 +1,6 @@
 node_modules
+/web
+*.md
 .git
 .vscode
 dist
@@ -11,3 +13,8 @@ tmp
 logs
 *.log
 .env
+.gitignore
+
+# Docker
+Dockerfile*
+docker-compose*.yml
