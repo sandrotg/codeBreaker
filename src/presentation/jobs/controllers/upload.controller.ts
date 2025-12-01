@@ -1,9 +1,10 @@
 import { Controller, Post, Body, HttpException, HttpStatus } from '@nestjs/common';
 import { MinioService } from 'src/infrastructure/minio/minio.service';
 import { GenerateUploadUrlDto } from 'src/application/jobs/dto/job.dto';
+import { ApiBearerAuth } from '@nestjs/swagger';
 import { Public } from 'src/presentation/shared/decorators/public.decorator';
 
-@Public()
+@ApiBearerAuth('bearer')
 @Controller('upload')
 export class UploadController {
   constructor(private readonly minioService: MinioService) {}

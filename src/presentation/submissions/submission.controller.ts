@@ -3,9 +3,10 @@ import { CreateSubmissionDto } from "src/application/submissions/dto/create-subm
 import { UpdateStatusSubmissionDto } from "src/application/submissions/dto/update-status-submission.dto";
 import { CreateSubmissionUseCase } from "src/application/submissions/usecases/create-submission.usecase";
 import { UpdateStatusSubmissionUseCase } from "src/application/submissions/usecases/update-status-submission.usecase";
-import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiParam } from "@nestjs/swagger";
+import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiParam, ApiBearerAuth } from "@nestjs/swagger";
 
 @ApiTags('submissions')
+@ApiBearerAuth('bearer')
 @Controller('submissions')
 export class SubmissionController{
     constructor(

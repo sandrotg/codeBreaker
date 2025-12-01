@@ -18,6 +18,8 @@ import { Roles } from 'src/presentation/shared/decorators/roles.decorator';
 import { Public } from 'src/presentation/shared/decorators/public.decorator';
 import { roleName } from 'src/domain/users/entities/role.entity';
 import { GetCoursesByStudentUseCase } from 'src/application/users/use-cases/get-CoursesByStudent.use-case';
+
+@ApiBearerAuth('bearer')
 @Controller("users")
 export class UsersController {
   constructor(

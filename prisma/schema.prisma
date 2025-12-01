@@ -66,7 +66,7 @@ model EvaluationCourse {
   id                String    @id @default(cuid())
   evaluationId      String
   courseId          String
-  evaluation        Evaluation @relation(fields:[evaluationId], references:[evaluationId])
+  evaluation        Evaluation @relation(fields:[evaluationId], references:[evaluationId], onDelete: Cascade)
   course            Course     @relation(fields:[courseId], references:[courseId])
   @@unique([evaluationId, courseId])
 }
@@ -153,7 +153,7 @@ model EvaluationResult {
   startedAt         DateTime @default(now())
   completedAt       DateTime?
   
-  evaluation        Evaluation @relation(fields: [evaluationId], references: [evaluationId])
+  evaluation        Evaluation @relation(fields: [evaluationId], references: [evaluationId], onDelete: Cascade)
   
   @@unique([evaluationId, userId])
   @@index([evaluationId])
@@ -164,7 +164,7 @@ model EvaluationChallenge {
   id                String    @id @default(cuid())
   evaluationId      String
   challengeId       String
-  evaluation        Evaluation @relation(fields: [evaluationId], references: [evaluationId])
+  evaluation        Evaluation @relation(fields: [evaluationId], references: [evaluationId], onDelete: Cascade)
   challenge         Challenge  @relation(fields: [challengeId], references: [challengeId])
   @@unique([evaluationId, challengeId])
 }

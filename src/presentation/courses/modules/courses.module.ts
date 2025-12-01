@@ -22,11 +22,27 @@ import { AddEvaluationToCourseUseCase } from "src/application/courses/usecases/a
 import { EvaluationRepository } from "src/domain/evaluations/repositories/evaluation.repository";
 import { PrismaEvaluationRepository } from "src/infrastructure/evaluation/prisma-evaluation.repository";
 import { GetAllEvaluationsCourseUseCase } from "src/application/courses/usecases/get-all-evaluations.usecase";
+import { JwtStrategy } from "src/presentation/shared/strategies/jwt.strategy";
+import { PassportModule } from "@nestjs/passport";
+import { JwtModule } from "@nestjs/jwt";
+import { ConfigModule, ConfigService } from "@nestjs/config";
 
 @Module({
+    imports: [
+        PassportModule.register({ defaultStrategy: 'jwt' }),
+        JwtModule.registerAsync({
+            imports: [ConfigModule],
+            inject: [ConfigService],
+            useFactory: (config: ConfigService) => ({
+                secret: config.get('JWT_SECRET'),
+                signOptions: { expiresIn: '15m' },
+            }),
+        }),
+    ],
     controllers: [CoursesController],
     providers: [
         PrismaService,
+        JwtStrategy,
         {
             provide: COURSE_REPOSITORY,
             useFactory: (prisma: PrismaService) => new PrismaCoursesRepository(prisma),
@@ -101,7 +117,7 @@ import { GetAllEvaluationsCourseUseCase } from "src/application/courses/usecases
             provide: ListAllCoursesUseCase,
             useFactory: (courseRepo: CourseRepositoryPort) => new ListAllCoursesUseCase(courseRepo),
             inject: [COURSE_REPOSITORY]
-        }    
+        } 
     ],
 })
 export class CoursesModule { }

@@ -5,7 +5,7 @@ export class UpdateTestCaseDto {
   @IsNotEmpty()
   @IsString()
   @ApiPropertyOptional({
-    example: '7f89c2e4-1b2a-4b3e-9a67-ec12f1f4a8cd',
+    example: '643f1b2c8f1b2c001c9e4b8a',
     description: 'Identificador único del reto al que pertenece este caso de prueba.',
   })
   challengeId?: string;

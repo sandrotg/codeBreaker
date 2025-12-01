@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Param, ParseIntPipe, Post } from "@nestjs/common";
-import { ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags, ApiBearerAuth } from "@nestjs/swagger";
 import { createCourseDto } from "src/application/courses/dto/create-course.dto";
 import { AddChanllengeToCourseUseCase } from "src/application/courses/usecases/add-challenge-course.usecase";
 import { AddEvaluationToCourseUseCase } from "src/application/courses/usecases/add-evaluation-course.usecase";
@@ -13,6 +13,7 @@ import { GetCourseByTitleUseCase } from "src/application/courses/usecases/get-by
 import { ListAllCoursesUseCase } from "src/application/courses/usecases/list-all-courses.usecase";
 
 @ApiTags('courses')
+@ApiBearerAuth('bearer')
 @Controller('courses')
 export class CoursesController {
     constructor(

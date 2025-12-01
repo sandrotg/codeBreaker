@@ -1,5 +1,5 @@
 import { Controller, Get, Post, Body, Param, Delete, Put } from '@nestjs/common';
-import { ApiOkResponse, ApiOperation, ApiTags, OmitType, } from '@nestjs/swagger';
+import { ApiOkResponse, ApiOperation, ApiTags, OmitType, ApiBearerAuth } from '@nestjs/swagger';
 import { CreateTestCaseUseCase } from 'src/application/challenges/useCases/testCases/createTestCase.useCase';
 import { DeleteTestCaseUseCase } from 'src/application/challenges/useCases/testCases/deleteTestCase.useCase';
 import { FindTestCaseByIdUseCase } from 'src/application/challenges/useCases/testCases/findTestCaseById.seCase';
@@ -9,6 +9,7 @@ import { CreateTestCaseDto } from 'src/application/challenges/dto/testCases/crea
 import { UpdateTestCaseDto } from 'src/application/challenges/dto/testCases/updateTestCase.dto';
 
 @ApiTags("TestCase")
+@ApiBearerAuth('bearer')
 @Controller("testcase")
 export class TestCasesController {
     constructor(

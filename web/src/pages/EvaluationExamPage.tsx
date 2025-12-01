@@ -188,7 +188,7 @@ export function EvaluationExamPage() {
         setLanguage(saved.language);
       } else {
         setCode('');
-        setLanguage('python');
+        setLanguage('Python');
       }
     }
   };

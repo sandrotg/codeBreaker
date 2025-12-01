@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import type { User } from '../types/auth.types';
 import { ApiService } from '../services/api.service';
 import { cookieUtils } from '../utils/cookies';
+import { setupFetchInterceptor } from '../utils/fetchInterceptor';
 
 interface AuthContextType {
   user: User | null;
@@ -10,6 +11,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<void>;
   register: (userName: string, email: string, password: string) => Promise<void>;
   logout: () => void;
+  refreshAuthToken: () => Promise<boolean>;
   isAuthenticated: boolean;
 }
 
@@ -33,6 +35,37 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         cookieUtils.clearAuth();
       }
     }
+
+    // Setup fetch interceptor for automatic token refresh
+    setupFetchInterceptor({
+      onRefreshToken: async () => {
+        const savedRefreshToken = cookieUtils.get('refreshToken');
+        
+        if (!savedRefreshToken) {
+          return false;
+        }
+
+        try {
+          const response = await ApiService.refreshToken(savedRefreshToken);
+          const { user: newUser, token: newToken } = response;
+          
+          setUser(newUser);
+          setToken(newToken.accessToken);
+          
+          cookieUtils.set('user', encodeURIComponent(JSON.stringify(newUser)), 7);
+          cookieUtils.set('token', newToken.accessToken, 7);
+          cookieUtils.set('refreshToken', newToken.refreshToken, 7);
+          
+          return true;
+        } catch (error) {
+          console.error('Token refresh failed:', error);
+          setUser(null);
+          setToken(null);
+          cookieUtils.clearAuth();
+          return false;
+        }
+      }
+    });
   }, []);
 
   const login = async (email: string, password: string) => {
@@ -71,6 +104,37 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     cookieUtils.clearAuth();
   };
 
+  const refreshAuthToken = async (): Promise<boolean> => {
+    try {
+      const savedRefreshToken = cookieUtils.get('refreshToken');
+      
+      if (!savedRefreshToken) {
+        console.log('❌ No refresh token available');
+        logout();
+        return false;
+      }
+
+      console.log('🔄 Refreshing access token...');
+      const response = await ApiService.refreshToken(savedRefreshToken);
+      const { user: newUser, token: newToken } = response;
+      
+      setUser(newUser);
+      setToken(newToken.accessToken);
+      
+      // Update cookies
+      cookieUtils.set('user', encodeURIComponent(JSON.stringify(newUser)), 7);
+      cookieUtils.set('token', newToken.accessToken, 7);
+      cookieUtils.set('refreshToken', newToken.refreshToken, 7);
+      
+      console.log('✅ Token refreshed successfully');
+      return true;
+    } catch (error) {
+      console.error('❌ Error refreshing token:', error);
+      logout();
+      return false;
+    }
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -79,6 +143,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         login,
         register,
         logout,
+        refreshAuthToken,
         isAuthenticated: !!user,
       }}
     >

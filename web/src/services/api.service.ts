@@ -40,6 +40,8 @@ export interface TestCase {
   output: string;
 }
 
+export type Language = 'Python' | 'C++' | 'Java' | 'Node.js';
+
 export interface CaseResult {
   caseId: string;
   status: string;
@@ -73,7 +75,7 @@ export interface Submission {
   submissionId: string;
   user: string;
   challengeId: string;
-  language: string;
+  language: Language;
   status: string;
   createdAt: string;
   score?: number;
@@ -424,11 +426,25 @@ export class ApiService {
       headers: {
         'Content-Type': 'application/json',
       },// student
-      body: JSON.stringify({ userName, email, password, roleId: '597b2e7f-b95b-4ea3-95ff-15b61d64ce86' }),
+      body: JSON.stringify({ userName, email, password, roleId: 'e5dfb21a-0ca6-457c-a077-a96d1fedeaa1' }),
     });
     if (!response.ok) {
       const error = await response.text();
       throw new Error(error || 'Error al registrar usuario');
+    }
+    return response.json();
+  }
+
+  static async refreshToken(refreshToken: string): Promise<{ user: User; token: { accessToken: string; refreshToken: string } }> {
+    const response = await fetch(`${API_URL}/users/refresh-token`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ refreshToken }),
+    });
+    if (!response.ok) {
+      throw new Error('Error al refrescar token');
     }
     return response.json();
   }

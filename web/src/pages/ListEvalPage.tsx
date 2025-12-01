@@ -194,7 +194,7 @@ export function EvaluationsListPage() {
       </div>
 
       <div className="evaluations-count">
-        {evaluations.length} evaluación{evaluations.length !== 1 ? 'es' : ''} encontrada{evaluations.length !== 1 ? 's' : ''}
+        {evaluations.length} evaluaci{evaluations.length !== 1 ? 'ones' : 'ón'} encontrada{evaluations.length !== 1 ? 's' : ''}
       </div>
 
       <div className="evaluations-grid">

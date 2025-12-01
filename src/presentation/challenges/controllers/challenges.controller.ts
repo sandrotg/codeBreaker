@@ -1,5 +1,5 @@
 import { Controller, Get, Post, Body, Param, Delete, Put, Patch } from '@nestjs/common';
-import { ApiOkResponse, ApiOperation, ApiTags, } from '@nestjs/swagger';
+import { ApiOkResponse, ApiOperation, ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { CreateChallengeUseCase } from 'src/application/challenges/useCases/challenges/createChallenge.useCase';
 import { DeleteChallengeUseCase } from 'src/application/challenges/useCases/challenges/deleteChallenge.useCase';
 import { findChallengeByIdUseCase } from 'src/application/challenges/useCases/challenges/findChallengeById.useCase';
@@ -11,6 +11,7 @@ import { CreateChallengeDto } from 'src/application/challenges/dto/challenges/cr
 import { UpdateChallengeDto } from 'src/application/challenges/dto/challenges/updateChallenge.dto';
 
 @ApiTags("Challenge")
+@ApiBearerAuth('bearer')
 @Controller("challenge")
 export class ChallengeController {
     constructor(

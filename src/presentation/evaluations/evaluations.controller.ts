@@ -1,5 +1,5 @@
 import { Controller, Get, Post, Body, Param, Delete, Put, Patch } from '@nestjs/common';
-import { ApiOkResponse, ApiOperation, ApiTags, } from '@nestjs/swagger';
+import { ApiOkResponse, ApiOperation, ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { CreateEvaluationUseCase } from 'src/application/evaluation/useCases/createEvaluation.useCase';
 import { CreateEvaluationDto } from 'src/application/evaluation/dto/createEvaluation.dto';
 import { DeleteEvaluationUseCase } from 'src/application/evaluation/useCases/deleteEvaluation.useCase';
@@ -17,6 +17,7 @@ import { DeleteEvaluationResultUseCase } from 'src/application/evaluation/useCas
 import { EvaluationState } from 'src/domain/evaluations/entities/evaluation.entity';
 
 @ApiTags("Evaluation")
+@ApiBearerAuth('bearer')
 @Controller("evaluation")
 export class EvaluationController {
     constructor(

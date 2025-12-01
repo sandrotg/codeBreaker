@@ -2,9 +2,10 @@ import { Controller, Get, Post, Body, Param, Query, ParseIntPipe } from '@nestjs
 import { CreateRoleDto } from 'src/application/users/dto/createRole.dto';
 import { CreateRoleUseCase } from 'src/application/users/use-cases/createRole.use-case';
 import { GetRoleUseCase } from 'src/application/users/use-cases/getRole.use-case';
-import {ApiBody,ApiCreatedResponse,ApiOkResponse,ApiOperation,ApiParam,ApiQuery,ApiTags,} from '@nestjs/swagger';   
+import {ApiBody,ApiCreatedResponse,ApiOkResponse,ApiOperation,ApiParam,ApiQuery,ApiTags,ApiBearerAuth} from '@nestjs/swagger';   
 
 @ApiTags("Roles")
+@ApiBearerAuth('bearer')
 @Controller ("roles")
 export class RolesController{
     constructor(

@@ -11,16 +11,16 @@ import './ChallengeDetailPage.css';
 
 const LANGUAGE_OPTIONS = [
   { value: 'Python', label: 'Python', monacoLang: 'python' },
-  { value: 'CPlusPlus', label: 'C++', monacoLang: 'cpp' },
+  { value: 'C++', label: 'C++', monacoLang: 'cpp' },
   { value: 'Java', label: 'Java', monacoLang: 'java' },
-  { value: 'Node', label: 'Node.js', monacoLang: 'javascript' },
+  { value: 'Node.js', label: 'Node.js', monacoLang: 'javascript' },
 ];
 
 const DEFAULT_CODE: Record<string, string> = {
-  Python: '# Escribe tu solución aquí\ndef solve():\n    pass\n',
-  CPlusPlus: '// Escribe tu solución aquí\n#include <iostream>\nusing namespace std;\n\nint main() {\n    return 0;\n}\n',
-  Java: '// Escribe tu solución aquí\npublic class Solution {\n    public static void main(String[] args) {\n        \n    }\n}\n',
-  Node: '// Escribe tu solución aquí\nfunction solve() {\n    \n}\n',
+  'Python': '# Escribe tu solución aquí\ndef solve():\n    pass\n',
+  'C++': '// Escribe tu solución aquí\n#include <iostream>\nusing namespace std;\n\nint main() {\n    return 0;\n}\n',
+  'Java': '// Escribe tu solución aquí\npublic class Solution {\n    public static void main(String[] args) {\n        \n    }\n}\n',
+  'Node.js': '// Escribe tu solución aquí\nfunction solve() {\n    \n}\n',
 };
 
 export function ChallengeDetailPage() {
