@@ -2,7 +2,7 @@ import { useAuth } from '../contexts/AuthContext';
 
 // IDs de roles
 export const ROLES = {
-  ADMIN: '6bf70524-219e-4a31-a2c0-89ec507cb459',
+  ADMIN: 'v6bf70524-219e-4a31-a2c0-89ec507cb459',
   STUDENT: '597b2e7f-b95b-4ea3-95ff-15b61d64ce86',
 } as const;
 

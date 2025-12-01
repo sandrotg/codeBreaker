@@ -21,7 +21,7 @@ model User {
   passwordHash      String
   roleId            String
   createdAt         DateTime @default(now())
-  role              Role     @relation(fields:[roleId], references:[roleId])
+  role              Role     @relation(fields:[roleId], references:[roleId], onUpdate: Cascade)
   courses           UserCourse[]
 }
 

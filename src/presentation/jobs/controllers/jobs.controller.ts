@@ -22,13 +22,6 @@ export class JobsController {
   @Post('submit')
   async submit(@Body() dto: SubmitJobDto) {
     try {
-      const supportedLanguages = ['python', 'c', 'cpp', 'java', 'javascript'];
-      if (!supportedLanguages.includes(dto.language.toLowerCase())) {
-        throw new HttpException(
-          `Unsupported language. Allowed: ${supportedLanguages.join(', ')}`,
-          HttpStatus.BAD_REQUEST,
-        );
-      }
 
       const job = await this.submitJob.execute({ fileKey: dto.fileKey, inputKey: dto.inputKey, language: dto.language.toLowerCase() });
 

@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+// import { Link } from 'react-router-dom';
 import { ApiService } from '../services/api.service';
 import { 
   Search, 
   Filter, 
-  Eye, 
+  // Eye, 
   Clock, 
   Code, 
   User, 
@@ -194,16 +194,15 @@ export function SubmissionsPage() {
   };
 
   const getLanguageColor = (language: string) => {
-    switch (language.toLowerCase()) {
-      case 'python':
+    switch (language) {
+      case 'Python':
         return '#306998';
-      case 'javascript':
-        return '#f0db4f';
-      case 'java':
+      case 'Java':
         return '#007396';
-      case 'cpp':
-      case 'c++':
+      case 'CPlusPlus':
         return '#00599c';
+      case 'Node':
+        return '#68a063';
       default:
         return '#666';
     }
@@ -277,10 +276,10 @@ export function SubmissionsPage() {
             <Filter size={16} />
             <select value={filterLanguage} onChange={(e) => setFilterLanguage(e.target.value)}>
               <option value="all">Todos los lenguajes</option>
-              <option value="python">Python</option>
-              <option value="javascript">JavaScript</option>
-              <option value="java">Java</option>
-              <option value="cpp">C++</option>
+              <option value="Python">Python</option>
+              <option value="CPlusPlus">C++</option>
+              <option value="Java">Java</option>
+              <option value="Node">Node.js</option>
             </select>
           </div>
         </div>

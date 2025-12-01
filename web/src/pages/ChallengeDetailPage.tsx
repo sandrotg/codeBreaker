@@ -11,16 +11,16 @@ import './ChallengeDetailPage.css';
 
 const LANGUAGE_OPTIONS = [
   { value: 'Python', label: 'Python', monacoLang: 'python' },
-  { value: 'C++', label: 'C++', monacoLang: 'cpp' },
+  { value: 'CPlusPlus', label: 'C++', monacoLang: 'cpp' },
   { value: 'Java', label: 'Java', monacoLang: 'java' },
-  { value: 'Node.js', label: 'Node.js', monacoLang: 'javascript' },
+  { value: 'Node', label: 'Node.js', monacoLang: 'javascript' },
 ];
 
 const DEFAULT_CODE: Record<string, string> = {
   'Python': '# Escribe tu solución aquí\ndef solve():\n    pass\n',
-  'C++': '// Escribe tu solución aquí\n#include <iostream>\nusing namespace std;\n\nint main() {\n    return 0;\n}\n',
+  'CPlusPlus': '// Escribe tu solución aquí\n#include <iostream>\nusing namespace std;\n\nint main() {\n    return 0;\n}\n',
   'Java': '// Escribe tu solución aquí\npublic class Solution {\n    public static void main(String[] args) {\n        \n    }\n}\n',
-  'Node.js': '// Escribe tu solución aquí\nfunction solve() {\n    \n}\n',
+  'Node': '// Escribe tu solución aquí\nfunction solve() {\n    \n}\n',
 };
 
 export function ChallengeDetailPage() {
@@ -96,7 +96,7 @@ export function ChallengeDetailPage() {
 
       // 2) Preparar nombre/extension del archivo de código
       const id = (crypto as any)?.randomUUID?.() ?? `${Date.now()}`;
-      const extMap: Record<string, string> = { Python: 'py', 'C++': 'cpp', Java: 'java', 'Node.js': 'js' };
+      const extMap: Record<string, string> = { Python: 'py', CPlusPlus: 'cpp', Java: 'java', Node: 'js' };
       const ext = extMap[selectedLanguage] ?? 'txt';
       const filename = `code/${id}/solution.${ext}`;
 

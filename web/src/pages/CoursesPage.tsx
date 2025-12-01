@@ -120,9 +120,15 @@ export function CoursesPage() {
 
   const handleCreateCourse = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!user?.email) {
+      setError('Usuario no autenticado');
+      return;
+    }
+    
     try {
       const courseData = {
-        creatorEmail: "Email@Email.com", // En una app real, esto vendría del usuario autenticado
+        creatorEmail: user.email,
         title: newCourse.title,
         nrc: parseInt(newCourse.nrc),
         period: newCourse.period,
