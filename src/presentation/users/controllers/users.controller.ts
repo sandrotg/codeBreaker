@@ -74,9 +74,9 @@ export class UsersController {
   }
 
   // 🔐 PROTEGIDO
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(roleName.STUDENT)
-  @ApiBearerAuth()
+
+
+  @Public()
   @Get('/:id')
   async GetUserById(@Param('id') id: string) {
     return this.getUser.execute({ userId: id, criteria: 'id' });

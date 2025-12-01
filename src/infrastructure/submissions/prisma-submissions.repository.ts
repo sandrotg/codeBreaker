@@ -86,4 +86,23 @@ export class PrismaSubmissionsRepository implements SubmissionRepositoryPort {
             updated.cases.map(m => new CasesResult(m.caseId, m.status, m.timeMs))
         )
     }
+
+    async findAll(): Promise<Submission[]> {
+        const submissions = await this.prisma.submission.findMany({
+            include: {
+                cases: true
+            }
+        });
+        return submissions.map(submission => new Submission(
+            submission.submissionId,
+            submission.user,
+            submission.challengeId,
+            mapLanguageFromPrisma(submission.language),
+            mapStatusFromPrisma(submission.status),
+            submission.createdAt,
+            submission.score ?? undefined,
+            submission.timeMsTotal ?? undefined,
+            submission.cases.map(m => new CasesResult(m.caseId, m.status, m.timeMs))
+        ));
+    }
 }

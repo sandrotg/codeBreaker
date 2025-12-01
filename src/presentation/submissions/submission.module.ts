@@ -6,6 +6,7 @@ import { CreateSubmissionUseCase } from "src/application/submissions/usecases/cr
 import { SubmissionRepositoryPort } from "src/domain/submissions/repositories/submission.repository.port";
 import { UpdateStatusSubmissionUseCase } from "src/application/submissions/usecases/update-status-submission.usecase";
 import { SUBMISSION_REPOSITORY } from "src/application/tokens";
+import { FindAllSubmissionsUsecase } from "src/application/submissions/usecases/find-all-submissions.usecase";
 
 @Module({
     controllers: [SubmissionController],
@@ -24,6 +25,11 @@ import { SUBMISSION_REPOSITORY } from "src/application/tokens";
         {
             provide: UpdateStatusSubmissionUseCase,
             useFactory: (repo: SubmissionRepositoryPort) => new UpdateStatusSubmissionUseCase(repo),
+            inject: [SUBMISSION_REPOSITORY]
+        },
+        {
+            provide: FindAllSubmissionsUsecase,
+            useFactory: (repo: SubmissionRepositoryPort) => new FindAllSubmissionsUsecase(repo),
             inject: [SUBMISSION_REPOSITORY]
         }
     ],

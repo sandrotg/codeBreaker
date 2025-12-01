@@ -356,6 +356,14 @@ export class ApiService {
     return updatedSubmission as Submission;
   }
 
+  static async findAllSubmissions(): Promise<Submission[]> {
+    const response = await fetch(`${API_URL}/submissions/`, {
+      headers: getAuthHeaders(),
+    });
+    if (!response.ok) throw new Error('Error al obtener submissions');
+    return response.json();
+  }
+
   // ============ Upload ============
 
   static async generateUploadUrl(filename: string): Promise<UploadUrlResponse> {
@@ -559,6 +567,14 @@ export class ApiService {
     if (!response.ok) {
       throw new Error('Error al refrescar token');
     }
+    return response.json();
+  }
+
+  static async getUserById(id: string): Promise<User> {
+    const response = await fetch(`${API_URL}/users/${id}`, {
+      headers: getAuthHeaders(),
+    });
+    if (!response.ok) throw new Error('Error al obtener usuario');
     return response.json();
   }
 
