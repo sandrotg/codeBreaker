@@ -85,6 +85,23 @@ export interface Submission {
   createdAt: string;
   score?: number;
   timeMsTotal?: number;
+  cases?: CaseResult[];
+}
+
+export type StatusSubmission =
+  | 'QUEUED'
+  | 'RUNNING'
+  | 'ACCEPTED'
+  | 'WRONG_ANSWER'
+  | 'TIME_LIMIT_EXCEEDED'
+  | 'RUNTIME_ERROR'
+  | 'COMPILATION_ERROR';
+
+export interface UpdateStatusSubmissionPayload {
+  status: StatusSubmission;
+  score?: number;
+  timeMsTotal?: number;
+  cases?: CaseResult[];
 }
 
 export interface Course {
@@ -261,7 +278,84 @@ export class ApiService {
     return response.json();
   }
 
-  
+  static async updateSubmission(responses: JobResponse[], cases: TestCase[], submissionId: string): Promise<Submission> {
+    const jobs = responses.map(r => r.data);
+    const err = jobs.map(job => job.error?.toLowerCase() ?? '');
+    const caseResults: CaseResult[] = [];
+    let correctCount = 0;
+    let totalTime = 0;
+
+    jobs.map(job => {
+      if (job.status === 'QUEUED') return { status: 'QUEUED' };
+      if (job.status === 'PROCESSING') return { status: 'RUNNING' };
+      if (job.status === 'FAILED') {
+        if (err.includes('compile')) return { status: 'COMPILATION_ERROR' };
+        if (err.includes('time') || err.includes('timeout')) return { status: 'TIME_LIMIT_EXCEEDED' };
+        return { status: 'RUNTIME_ERROR' };
+      }
+    });
+
+    const n = Math.min(jobs.length, cases.length);
+
+    // Comparar pares por índice
+    for (let i = 0; i < n; i++) {
+      const job = jobs[i];
+      const testCase = cases[i];
+
+      const jobOutput = (job.output ?? '').trim();
+      const expectedOutput = (testCase.output ?? '').trim();
+
+      const passed = jobOutput === expectedOutput;
+      if (passed) correctCount++;
+
+      const timeMs = job.executionTime ?? 0;
+      totalTime += timeMs;
+
+      caseResults.push({
+        caseId: testCase.testCaseId,
+        status: passed ? 'CORRECT' : 'FAILED',
+        timeMs,
+      });
+    }
+
+    // Si faltaron jobs para algunos casos, marcarlos como FAILED
+    if (cases.length > n) {
+      for (let i = n; i < cases.length; i++) {
+        caseResults.push({
+          caseId: cases[i].testCaseId,
+          status: 'FAILED',
+          timeMs: 0,
+        });
+      }
+    }
+
+    const allPassed = correctCount === cases.length;
+    const score = Math.round((correctCount / (cases.length || 1)) * 100);
+    const status: StatusSubmission = allPassed ? 'ACCEPTED' : 'WRONG_ANSWER';
+
+    const payload: UpdateStatusSubmissionPayload = {
+      status,
+      score,
+      timeMsTotal: totalTime,
+      cases: caseResults,
+    };
+
+    const res = await fetch(`${API_URL}/submissions/${submissionId}/status`, {
+      method: 'PUT',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(payload),
+    });
+
+    if (!res.ok) {
+      const text = await res.text();
+      throw new Error(text || 'Error al actualizar la submission en el servidor');
+    }
+
+    // Parsear y devolver la submission actualizada (antes se devolvía el Response crudo)
+    const updatedSubmission = await res.json();
+    return updatedSubmission as Submission;
+  }
+
   // ============ Upload ============
 
   static async generateUploadUrl(filename: string): Promise<UploadUrlResponse> {
@@ -314,12 +408,12 @@ export class ApiService {
         })
       });
       if (!res.ok) {
-          const text = await res.text();
-          throw new Error(text || 'Error al enviar el job a la cola');
+        const text = await res.text();
+        throw new Error(text || 'Error al enviar el job a la cola');
       }
-        return (await res.json()) as JobResponse;
+      return (await res.json()) as JobResponse;
     }));
-     return jobs;
+    return jobs;
   }
 
   static async getJobById(id: string): Promise<JobResponse> {

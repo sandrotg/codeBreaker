@@ -3,9 +3,9 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { ApiService, type Challenge, type JobResponse, type TestCase, type UploadUrlResponse } from '../services/api.service';
 import { useAuth } from '../contexts/AuthContext';
 import Editor from '@monaco-editor/react';
-import { 
-  Clock, Database, Tag, ArrowLeft, Play, CheckCircle, 
-  XCircle, Code, Terminal 
+import {
+  Clock, Database, Tag, ArrowLeft, Play, CheckCircle,
+  XCircle, Code, Terminal
 } from 'lucide-react';
 import './ChallengeDetailPage.css';
 
@@ -88,13 +88,13 @@ export function ChallengeDetailPage() {
     setSubmissionResult(null);
 
     try {
-      await ApiService.createSubmission({
+      const submission = await ApiService.createSubmission({
         user: user.userId,
         challengeId: challenge.challengeId,
         lenguage: selectedLanguage,
       });
 
-     // 2) Preparar nombre/extension del archivo de código
+      // 2) Preparar nombre/extension del archivo de código
       const id = (crypto as any)?.randomUUID?.() ?? `${Date.now()}`;
       const extMap: Record<string, string> = { Python: 'py', 'C++': 'cpp', Java: 'java', 'Node.js': 'js' };
       const ext = extMap[selectedLanguage] ?? 'txt';
@@ -113,6 +113,17 @@ export function ChallengeDetailPage() {
       const jobs: JobResponse[] = await ApiService.submitToQueueWorker(codeResponse, inputResponses, selectedLanguage);
       console.log('Jobs enviados:', jobs);
 
+      const results = await Promise.all(jobs.map(async (j) => {
+        let jobResult = await ApiService.getJobById(j.data.id);
+        while (jobResult.data.status === 'QUEUED' || jobResult.data.status === 'PROCESSING') {
+          jobResult = await ApiService.getJobById(j.data.id);
+        }
+        return jobResult;
+      }));
+
+      // 6) Actualizar el estado de la submission según resultados de los jobs
+      const updatePayload = await ApiService.updateSubmission(results, testCases, submission.submissionId);
+      console.log('Submission actualizada:', updatePayload);
       // Simular resultado
       setSubmissionResult({
         status: 'ACCEPTED',
