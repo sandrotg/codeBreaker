@@ -14,11 +14,11 @@ const getAuthHeaders = (): HeadersInit => {
   const headers: HeadersInit = {
     'Content-Type': 'application/json',
   };
-  
+
   if (token) {
     headers['Authorization'] = `Bearer ${token}`;
   }
-  
+
   return headers;
 };
 
@@ -38,6 +38,35 @@ export interface TestCase {
   challengeId: string;
   input: string;
   output: string;
+}
+
+export interface CaseResult {
+  caseId: string;
+  status: string;
+  timeMs: number;
+}
+
+export interface UploadUrlResponse {
+  success: boolean;
+  data: {
+    presignedUrl: string;
+    objectKey: string;
+  }
+}
+
+export interface Job {
+
+  id: string,
+  fileKey: string,
+  inputKey: string,
+  language: string,
+  status: string,
+  output?: string,
+  error?: string,
+  exitCode?: number,
+  executionTime?: number,
+  memoryUsed?: number,
+  createdAt?: Date,
 }
 
 export interface Submission {
@@ -223,6 +252,64 @@ export class ApiService {
     }
 
     return response.json();
+  }
+
+  // ============ Upload ============
+
+  static async generateUploadUrl(filename: string): Promise<UploadUrlResponse> {
+    const response = await fetch(`${API_URL}/upload/generate-url`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ fileName: filename }),
+    });
+    if (!response.ok) {
+      throw new Error('Error al generar URL de subida');
+    }
+
+    return response.json();
+  }
+
+  static async uploadFileToPresignedUrl(presignedUrl: string, file: File): Promise<void> {
+    const response = await fetch(presignedUrl, {
+      method: 'PUT',
+      body: file,
+    });
+    if (!response.ok) {
+      throw new Error('Error al subir el archivo');
+    }
+    console.log('Archivo subido exitosamente');
+  }
+
+  static async uploadTestCases(cases: TestCase[]): Promise<UploadUrlResponse[]> {
+    const responses = await Promise.all(cases.map(async (testCase) => {
+      const filename = `testcase-${testCase.testCaseId}-${testCase.challengeId}-${Date.now()}.txt`;
+      const uploadUrlResponse = await this.generateUploadUrl(filename);
+      const file = new File([testCase.input], filename, { type: 'text/plain' });
+      await this.uploadFileToPresignedUrl(uploadUrlResponse.data.presignedUrl, file);
+      return uploadUrlResponse;
+    }));
+    return responses;
+  }
+
+  static async submitToQueueWorker(
+    codeReponse: UploadUrlResponse,
+    inputResponses: UploadUrlResponse[],
+    language: string): Promise<Job[]> {
+    const jobs = await Promise.all(inputResponses.map(async (inputResponse) => {
+      const response = await fetch(`${API_URL}/jobs/submit`, {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        body: JSON.stringify({
+          fileKey: codeReponse.data.objectKey,
+          inputKey: inputResponse.data.objectKey,
+          language: language
+        })
+      });
+      if (!response.ok) {
+        throw new Error('Error al enviar el job a la cola');
+      }
+    }))
+     return jobs as unknown as Job[];
   }
 
   // ============ Courses ============

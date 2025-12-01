@@ -7,7 +7,9 @@ import { GetJobUseCase } from 'src/application/jobs/use-cases/get-job.usecase';
 import { ListJobsUseCase } from 'src/application/jobs/use-cases/list-jobs.usecase';
 import { toJobDto } from 'src/application/jobs/mappers/job.mapper';
 import { ApiOperation, ApiParam } from '@nestjs/swagger';
+import { Public } from 'src/presentation/shared/decorators/public.decorator';
 
+@Public()
 @Controller('jobs')
 export class JobsController {
   constructor(
