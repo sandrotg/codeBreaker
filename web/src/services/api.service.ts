@@ -71,6 +71,11 @@ export interface Job {
   createdAt?: Date,
 }
 
+export interface JobResponse {
+  success: boolean;
+  data: Job;
+}
+
 export interface Submission {
   submissionId: string;
   user: string;
@@ -256,6 +261,7 @@ export class ApiService {
     return response.json();
   }
 
+  
   // ============ Upload ============
 
   static async generateUploadUrl(filename: string): Promise<UploadUrlResponse> {
@@ -296,9 +302,9 @@ export class ApiService {
   static async submitToQueueWorker(
     codeReponse: UploadUrlResponse,
     inputResponses: UploadUrlResponse[],
-    language: string): Promise<Job[]> {
+    language: string): Promise<JobResponse[]> {
     const jobs = await Promise.all(inputResponses.map(async (inputResponse) => {
-      const response = await fetch(`${API_URL}/jobs/submit`, {
+      const res = await fetch(`${API_URL}/jobs/submit`, {
         method: 'POST',
         headers: getAuthHeaders(),
         body: JSON.stringify({
@@ -307,11 +313,24 @@ export class ApiService {
           language: language
         })
       });
-      if (!response.ok) {
-        throw new Error('Error al enviar el job a la cola');
+      if (!res.ok) {
+          const text = await res.text();
+          throw new Error(text || 'Error al enviar el job a la cola');
       }
-    }))
-     return jobs as unknown as Job[];
+        return (await res.json()) as JobResponse;
+    }));
+     return jobs;
+  }
+
+  static async getJobById(id: string): Promise<JobResponse> {
+    const response = await fetch(`${API_URL}/jobs/${id}`, {
+      method: 'GET',
+      headers: getAuthHeaders(),
+    });
+    if (!response.ok) {
+      throw new Error('Error al obtener el job');
+    }
+    return response.json();
   }
 
   // ============ Courses ============

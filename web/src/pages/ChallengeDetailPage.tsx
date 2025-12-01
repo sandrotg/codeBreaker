@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { ApiService, type Challenge, type TestCase } from '../services/api.service';
+import { ApiService, type Challenge, type JobResponse, type TestCase, type UploadUrlResponse } from '../services/api.service';
 import { useAuth } from '../contexts/AuthContext';
 import Editor from '@monaco-editor/react';
 import { 
@@ -93,6 +93,25 @@ export function ChallengeDetailPage() {
         challengeId: challenge.challengeId,
         lenguage: selectedLanguage,
       });
+
+     // 2) Preparar nombre/extension del archivo de código
+      const id = (crypto as any)?.randomUUID?.() ?? `${Date.now()}`;
+      const extMap: Record<string, string> = { Python: 'py', 'C++': 'cpp', Java: 'java', 'Node.js': 'js' };
+      const ext = extMap[selectedLanguage] ?? 'txt';
+      const filename = `code/${id}/solution.${ext}`;
+
+      // 3) Generar URL presignada para el código y subir el archivo
+      const codeResponse: UploadUrlResponse = await ApiService.generateUploadUrl(filename);
+      const codeFile = new File([code], `solution.${ext}`, { type: 'text/plain' });
+      await ApiService.uploadFileToPresignedUrl(codeResponse.data.presignedUrl, codeFile);
+
+      // 4) Subir los test cases del challenge (si no están ya en storage)
+      //    uploadTestCases retorna UploadUrlResponse[] (objectKey necesario para crear jobs)
+      const inputResponses: UploadUrlResponse[] = await ApiService.uploadTestCases(testCases);
+
+      // 5) Enviar jobs a la cola (uno por cada test case / inputResponse)
+      const jobs: JobResponse[] = await ApiService.submitToQueueWorker(codeResponse, inputResponses, selectedLanguage);
+      console.log('Jobs enviados:', jobs);
 
       // Simular resultado
       setSubmissionResult({
