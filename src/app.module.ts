@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
+import { BullModule } from '@nestjs/bull';
 import { ChallengeModule } from './presentation/challenges/modules/challenge.module';
 import { TestCaseModule } from './presentation/challenges/modules/testCase.module';
 import { AIChallengeModule } from './presentation/challenges/modules/ai-challenge.module';
@@ -17,6 +18,16 @@ import { JwtAuthGuard } from './presentation/shared/guards/jwt-auth.guard';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
+    }),
+    BullModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => ({
+        redis: {
+          host: configService.get('REDIS_HOST') || 'localhost',
+          port: configService.get('REDIS_PORT') || 6379,
+        },
+      }),
+      inject: [ConfigService],
     }),
   ChallengeModule,
   TestCaseModule,

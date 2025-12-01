@@ -9,7 +9,7 @@ import { toJobDto } from 'src/application/jobs/mappers/job.mapper';
 import { ApiOperation, ApiParam, ApiBearerAuth } from '@nestjs/swagger';
 import { Public } from 'src/presentation/shared/decorators/public.decorator';
 
-@ApiBearerAuth('bearer')
+@Public()
 @Controller('jobs')
 export class JobsController {
   constructor(

@@ -48,9 +48,9 @@ export class MinioService implements OnModuleInit {
   }
 
   async onModuleInit() {
-    // await this.ensureBucketExists(this.bucketCode);
-    // await this.ensureBucketExists(this.bucketResults);
-    // await this.ensureBucketExists(this.bucketInputs);
+    await this.ensureBucketExists(this.bucketCode);
+    await this.ensureBucketExists(this.bucketResults);
+    await this.ensureBucketExists(this.bucketInputs);
   }
 
   private async ensureBucketExists(bucketName: string) {

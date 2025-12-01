@@ -266,6 +266,14 @@
   background: #059669;
 }
 
+/* Monaco Editor Container */
+.monaco-editor-container {
+  flex: 1;
+  border-radius: 0 0 8px 8px;
+  overflow: hidden;
+  background: #1e1e1e;
+}
+
 .code-editor {
   flex: 1;
   padding: 1.5rem;

@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { ApiService } from '../services/api.service';
 import { useAuth } from '../contexts/AuthContext';
 import { Clock, ChevronLeft, ChevronRight, CheckCircle, AlertCircle } from 'lucide-react';
+import Editor from '@monaco-editor/react';
 import './EvaluationExamPage.css';
 
 interface Challenge {
@@ -25,6 +26,20 @@ interface EvaluationDetails {
   expiresAt: string;
 }
 
+const LANGUAGE_OPTIONS = [
+  { value: 'Python', label: 'Python', monacoLang: 'python' },
+  { value: 'C++', label: 'C++', monacoLang: 'cpp' },
+  { value: 'Java', label: 'Java', monacoLang: 'java' },
+  { value: 'Node.js', label: 'Node.js', monacoLang: 'javascript' },
+];
+
+const DEFAULT_CODE: Record<string, string> = {
+  'Python': '# Escribe tu solución aquí\ndef solve():\n    pass\n',
+  'C++': '// Escribe tu solución aquí\n#include <iostream>\nusing namespace std;\n\nint main() {\n    return 0;\n}\n',
+  'Java': '// Escribe tu solución aquí\npublic class Solution {\n    public static void main(String[] args) {\n        \n    }\n}\n',
+  'Node.js': '// Escribe tu solución aquí\nfunction solve() {\n    \n}\n',
+};
+
 export function EvaluationExamPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -34,8 +49,8 @@ export function EvaluationExamPage() {
   const [challenges, setChallenges] = useState<Challenge[]>([]);
   const [currentChallengeIndex, setCurrentChallengeIndex] = useState(0);
   const [timeRemaining, setTimeRemaining] = useState<number>(0); // en segundos
-  const [code, setCode] = useState<string>('');
-  const [language, setLanguage] = useState<string>('python');
+  const [code, setCode] = useState<string>(DEFAULT_CODE['Python']);
+  const [language, setLanguage] = useState<string>('Python');
   const [submissions, setSubmissions] = useState<Map<string, { code: string; language: string }>>(new Map());
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -187,9 +202,17 @@ export function EvaluationExamPage() {
         setCode(saved.code);
         setLanguage(saved.language);
       } else {
-        setCode('');
+        setCode(DEFAULT_CODE['Python']);
         setLanguage('Python');
       }
+    }
+  };
+
+  const handleLanguageChange = (lang: string) => {
+    setLanguage(lang);
+    // Si no hay código guardado para este challenge, usar el template por defecto
+    if (!code || code === DEFAULT_CODE[language]) {
+      setCode(DEFAULT_CODE[lang] || '');
     }
   };
 
@@ -400,26 +423,38 @@ export function EvaluationExamPage() {
           <div className="code-header">
             <select 
               value={language} 
-              onChange={(e) => setLanguage(e.target.value)}
+              onChange={(e) => handleLanguageChange(e.target.value)}
               className="language-select"
             >
-              <option value="python">Python</option>
-              <option value="javascript">JavaScript</option>
-              <option value="java">Java</option>
-              <option value="cpp">C++</option>
+              {LANGUAGE_OPTIONS.map((lang) => (
+                <option key={lang.value} value={lang.value}>
+                  {lang.label}
+                </option>
+              ))}
             </select>
             <button onClick={handleSubmitChallenge} className="btn-submit">
               Enviar Solución
             </button>
           </div>
           
-          <textarea
-            value={code}
-            onChange={(e) => setCode(e.target.value)}
-            className="code-editor"
-            placeholder="Escribe tu código aquí..."
-            spellCheck={false}
-          />
+          <div className="monaco-editor-container">
+            <Editor
+              height="500px"
+              language={LANGUAGE_OPTIONS.find(l => l.value === language)?.monacoLang || 'python'}
+              value={code}
+              onChange={(value) => setCode(value || '')}
+              theme="vs-dark"
+              options={{
+                minimap: { enabled: false },
+                fontSize: 14,
+                lineNumbers: 'on',
+                scrollBeyondLastLine: false,
+                automaticLayout: true,
+                wordWrap: 'on',
+                tabSize: 4,
+              }}
+            />
+          </div>
         </div>
       </div>
 
